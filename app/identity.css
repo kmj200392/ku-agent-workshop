@@ -1,0 +1,132 @@
+/* Shared visual language with minjaek.im. Interaction and layout state stay in the existing components. */
+:root {
+  --ink: #34435b;
+  --muted: #5d6e87;
+  --line: #dfe7f3;
+  --green: #245aca;
+  --lime: #f4f8ff;
+  --soft: #f0f5ff;
+  --heading: #142b4c;
+  --accent: #3269e8;
+}
+
+body {
+  color: var(--ink);
+  background: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button:focus-visible, a:focus-visible, textarea:focus-visible, input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+.brand-mark {
+  width: 34px;
+  height: 34px;
+  padding-bottom: 2px;
+  border-radius: 9px 9px 9px 3px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 20px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -.07em;
+  box-shadow: 0 3px 9px #3269e81a;
+}
+
+/* Lecture catalog */
+.lecture-home {
+  background: radial-gradient(ellipse 520px 400px at 0 100px, #edf3ff, transparent 100%), #fff;
+}
+.lecture-home::before, .shell::before {
+  content: "";
+  position: absolute;
+  z-index: 30;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #1d49ac, #427bf0 50%, #c5d8ff);
+  pointer-events: none;
+}
+.lecture-header, .lecture-main, .lecture-footer { width: min(1100px, calc(100% - 88px)); }
+.lecture-header { min-height: 87px; padding: 18px 0; }
+.lecture-brand { gap: 10px; color: var(--heading); font-size: 18px; letter-spacing: -.025em; }
+.lecture-brand small { color: var(--muted); font-size: 8px; }
+.lecture-profile { color: var(--muted); font-size: 13px; }
+.lecture-profile:hover { color: var(--green); }
+.lecture-intro { padding: 70px 0 58px; }
+.lecture-intro .eyebrow { color: var(--green); }
+.lecture-intro h1 { color: var(--heading); font-size: clamp(34px, 4vw, 50px); letter-spacing: -.045em; }
+.lecture-intro > p:last-child { color: var(--muted); font-size: 15px; }
+.lecture-section-heading { position: relative; margin-bottom: 24px; padding-bottom: 13px; border-bottom: 1px solid var(--line); }
+.lecture-section-heading::after { content: ""; position: absolute; bottom: -1px; left: 0; width: 34px; height: 2px; background: var(--accent); }
+.lecture-section-heading h2 { color: var(--heading); font-size: 20px; }
+.lecture-section-heading > span { color: var(--muted); }
+.lecture-card { border-color: var(--line); border-radius: 12px; box-shadow: 0 5px 20px #1b355e08; }
+.lecture-card:hover { border-color: #bfd1f4; box-shadow: 0 12px 28px #245aca14; }
+.lecture-cover { background: linear-gradient(140deg, #142b4c, #234b86); color: #fff; }
+.lecture-cover-top, .lecture-cover-bottom, .lecture-cover-title > span { color: #c6d9ff; }
+.lecture-card-body h3 { color: var(--heading); }
+.lecture-card-body > p, .lecture-details { color: var(--muted); }
+.lecture-tags > span { color: #245aca; background: #edf3ff; }
+.lecture-enter { color: var(--green); }
+.lecture-footer { color: var(--muted); }
+
+/* Workshop navigation and tools */
+.shell { position: relative; background: #fff; }
+.sidebar { background: linear-gradient(160deg, #f0f5ff, #fff 65%); border-color: var(--line); }
+.brand { color: var(--heading); }
+.brand small, .course-tag, .nav-caption, .sidebar-note p, .profile small { color: var(--muted); }
+.dot { background: var(--accent); }
+.tag { border-color: #d8e5fb; }
+.nav-item { color: #5d6e87; font-size: 13px; }
+.nav-item.active { color: #204fae; background: #e9f0ff; box-shadow: inset 0 0 0 1px #dce7ff; }
+.nav-item:hover { background: #f0f5ff; }
+.mini-icon, .avatar { background: #e9f0ff; color: #245aca; }
+.topbar { background: #fff; border-color: var(--line); }
+.crumb, .subtle { color: var(--muted); }
+.content { background: #fff; }
+.page-heading h1, .page-heading h2 { color: var(--heading); }
+.eyebrow { color: #5273ae; }
+.primary { background: var(--accent); color: #fff; }
+.primary:hover { background: #245aca; }
+.secondary { color: #345079; border-color: #d8e4f5; }
+.secondary:hover { background: #f0f5ff; }
+.mission-banner { background: linear-gradient(130deg, #142b4c, #234b86); color: #fff; }
+.mission-banner h2 { color: #fff; }
+.mission-banner p, .light-label { color: #c6d9ff; }
+.banner-tags span { color: #dce8ff; }
+.flow-node span, .flow-visual small { color: #c6d9ff; }
+.flow-node.emphasized { background: #e9f0ff; color: #204fae; }
+.flow-node.emphasized span { color: #5373a7; }
+.panel, .stat, .web-lecture { border-color: var(--line); }
+.panel-header svg { color: #6482ae; }
+.editor-body { background: #f8faff; }
+.editor-body textarea { color: #344b6c; }
+.sidebar-note p, .field-hint { color: var(--muted); font-size: 12px; }
+.guide-card p, .guide-card li { color: var(--muted); font-size: 13px; }
+.stat > span { color: var(--muted); font-size: 11px; }
+.stat em { color: var(--muted); font-size: 10px; }
+
+@media (max-width: 700px) {
+  .lecture-header, .lecture-main, .lecture-footer { width: calc(100% - 40px); }
+  .lecture-header { min-height: 76px; }
+  .lecture-intro { padding: 48px 0 40px; }
+}
+
+/* Keep every workshop section legible on narrow screens. */
+@media (max-width: 900px) {
+  .sidebar { flex-wrap: wrap; gap: 12px; padding: 16px 20px 12px; }
+  .sidebar .brand { flex: 0 0 100%; white-space: nowrap; }
+  .sidebar nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; width: 100%; margin: 0; }
+  .nav-item { justify-content: center; min-width: 0; min-height: 38px; padding: 7px 3px; font-size: 11px; line-height: 1.3; text-align: center; word-break: keep-all; }
+  .nav-item svg { display: none; }
+}
+
+@media (max-width: 360px) {
+  .sidebar { padding-inline: 16px; }
+  .nav-item { font-size: 10px; }
+}

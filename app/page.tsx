@@ -1,11 +1,11 @@
 import Link from 'next/link';
-import {ArrowRight, BookOpen, CalendarDays, Clock3, Code2} from 'lucide-react';
+import {ArrowRight, CalendarDays, Clock3, Code2} from 'lucide-react';
 import {lectures} from '../lib/lectures';
 
 export default function LectureHome() {
   return <div className="lecture-home">
     <header className="lecture-header">
-      <Link href="/" className="lecture-brand"><span className="brand-mark"><BookOpen size={21}/></span><span>Lectures<small>MINJAE KIM</small></span></Link>
+      <Link href="/" className="lecture-brand"><span className="brand-mark" aria-hidden="true">m.</span><span>Lectures<small>MINJAE KIM</small></span></Link>
       <a href="https://minjaek.im/" className="lecture-profile">강사 소개 <ArrowRight size={15}/></a>
     </header>
     <main className="lecture-main">

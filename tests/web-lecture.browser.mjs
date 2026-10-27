@@ -10,12 +10,15 @@ page.on('request',r=>{if(r.url().includes('api.baze.co'))modelRequests.push(r.ur
 const button=name=>page.getByRole('button',{name,exact:true});
 await fs.mkdir('outputs/web-lecture',{recursive:true});
 try {
+ // Preferences must survive even when server configuration has not arrived yet.
+ await page.route('**/api/config',async route=>{await new Promise(r=>setTimeout(r,1500));await route.continue();});
  await page.goto(base+'/agents#lesson/llm-agent');
  await page.getByRole('heading',{name:'LLM과 에이전트 시스템',exact:true}).waitFor();
  await button('예시 기록').click();await button('기록 불러오기').click();
  await page.getByText('최종 답변',{exact:true}).waitFor();
  const recorded=await page.evaluate(()=>localStorage.getItem('ku-agent:demo:record:D01'));
  assert.ok(recorded);
+ assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('ku-agent:demo-mode'))),'record','execution mode must persist independently of server readiness');
  await button('워크스페이스').click();await button('제출하고 평가').waitFor();
  await button('1일차 강의').click();await page.getByText('최종 답변',{exact:true}).waitFor();
  await page.reload();await page.getByText('최종 답변',{exact:true}).waitFor();

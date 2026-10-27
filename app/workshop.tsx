@@ -16,6 +16,7 @@ export default function Workshop(){
  const [authMode,setAuthMode]=useState('register'),[accessCode,setAccessCode]=useState(''),[issuedCode,setIssuedCode]=useState(''),[authBusy,setAuthBusy]=useState(false),[authError,setAuthError]=useState('');
  const [busy,setBusy]=useState(false),[stage,setStage]=useState(''),[current,setCurrent]=useState(''),[records,setRecords]=useState<any[]>([]),[result,setResult]=useState<any>(null),[pending,setPending]=useState<any>(null),[suite,setSuite]=useState<any[]>([]),[activeCases,setActiveCases]=useState<any[]>([]),[expanded,setExpanded]=useState(''),[board,setBoard]=useState<any>(null),[boardKind,setBoardKind]=useState('practice'),[boardError,setBoardError]=useState('');
  const [demoProgress,setDemoProgress]=useState<TraceEvent[]>([]);
+ const [demoReady,setDemoReady]=useState(false);
  const [demo,setDemo]=useState('D01'),[demoMode,setDemoMode]=useState('live'),[demoResult,setDemoResult]=useState<any>(null),[demoBusy,setDemoBusy]=useState(false),[demoStatus,setDemoStatus]=useState('');
  const abortRef=useRef<null|(()=>void)>(null),demoAbort=useRef<AbortController|null>(null),finalAttempt=useRef(false),busyRef=useRef(false),keyRef=useRef(''),pendingRef=useRef<any>(null),fileRef=useRef<HTMLInputElement>(null);
  keyRef.current=key;pendingRef.current=pending;
@@ -24,13 +25,13 @@ export default function Workshop(){
  useEffect(()=>{
   const hash=workshopView(location.hash);if(nav.some(n=>n[0]===hash))setView(hash);
   const handleHash=()=>{const h=workshopView(location.hash);if(nav.some(n=>n[0]===h))setView(h);};window.addEventListener('hashchange',handleHash);
-  setCode(storage.get('code',''));setResult(storage.get('last-result',null));setPending(storage.get('pending',null));setDemo(storage.get('demo-selected','D01'));setDemoMode(storage.get('demo-mode','live'));
+  setCode(storage.get('code',''));setResult(storage.get('last-result',null));setPending(storage.get('pending',null));setDemo(storage.get('demo-selected','D01'));setDemoMode(storage.get('demo-mode','live'));setDemoReady(true);
   Promise.all([api('config'),api('suite'),fetch('/starter.py').then(r=>r.text()),refreshMe()]).then(([c,s,starter])=>{setConfig(c);setSuite(s.cases);setCode((old:string)=>old||starter);setReady(true);}).catch((e:any)=>{setNotice(e.message);setReady(true);});
   const onUnload=(e:BeforeUnloadEvent)=>{if(busyRef.current){e.preventDefault();e.returnValue='';}};window.addEventListener('beforeunload',onUnload);
   return()=>{window.removeEventListener('hashchange',handleHash);window.removeEventListener('beforeunload',onUnload);};
  },[]);
  useEffect(()=>{if(ready&&code)storage.set('code',code);},[code,ready]);
- useEffect(()=>{if(!ready)return;storage.set('demo-selected',demo);storage.set('demo-mode',demoMode);setDemoResult(storage.get(`demo:${demoMode}:${demo}`,null));setDemoStatus('');},[demo,demoMode,ready]);
+ useEffect(()=>{if(!demoReady)return;storage.set('demo-selected',demo);storage.set('demo-mode',demoMode);setDemoResult(storage.get(`demo:${demoMode}:${demo}`,null));setDemoStatus('');},[demo,demoMode,demoReady]);
  useEffect(()=>{if(view==='leaderboard')refreshBoard();},[view,boardKind]);
  useEffect(()=>{
   const tick=async()=>{if(document.visibilityState!=='visible')return;try{const c=await api('config');setConfig(c);if(view==='leaderboard')await refreshBoard();if(pendingRef.current&&!busyRef.current)await upload(pendingRef.current);}catch{}};

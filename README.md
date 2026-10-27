@@ -28,3 +28,9 @@ npm run build
 - `/agents`: current AI Agent workshop (demos, workspace and leaderboard)
 
 To add a lecture, create its `app/<slug>/page.tsx` route and add its information to `lib/lectures.ts`. The home page renders the catalog automatically. Give new interactive courses their own storage keys and API/data namespace rather than reusing the agents leaderboard. Current workshop assets and API routes keep their root-relative URLs.
+
+## In-browser lecture materials
+
+`/agents#materials` displays the original Day 1 deck with a table of contents, keyboard navigation, fullscreen, text alternatives and page resume. PDF and ZIP downloads remain available. Static WebP slides avoid PDF plugin requirements and on-demand image transforms.
+
+After replacing `public/day1-materials.zip`, regenerate assets with `python3 scripts/build-lecture-materials.py` (Poppler and Pillow required locally). The script verifies page counts, preserves the original PDF bytes and excludes instructor notes from the text manifest. Page resume is versioned by the PDF hash.

@@ -1,0 +1,771 @@
+{
+  "title": "AI Agent 개발의 기본 구조",
+  "pdf": "/materials/day1/AI_Agent_Day1.pdf",
+  "sourceSha256": "639435b9fbc3379458e62cdfa5401c5a27fba624dbddad37039b946f3cabf67d",
+  "slides": [
+    {
+      "number": 1,
+      "title": "AI Agent 개발의 기본 구조",
+      "image": "/materials/day1/slide-01.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": null,
+      "text": [
+        "개념 설명과 단계별 시연",
+        "Minjae Kim",
+        "2026. 10. 28  19:00–21:00"
+      ],
+      "sources": []
+    },
+    {
+      "number": 2,
+      "title": "LLM과 에이전트 시스템",
+      "image": "/materials/day1/slide-02.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": null,
+      "text": [
+        "LLM 호출",
+        "입력을 받아 다음 출력을 생성",
+        "주어진 정보 안에서 답변",
+        "외부 행동은 앱이 연결해야 함",
+        "에이전트 시스템",
+        "모델에 도구와 실행 제어를 연결",
+        "결과를 보고 다음 행동 선택",
+        "프로그램이 실제 도구 실행",
+        "확인할 것은 답변의 문구와 실제 실행 기록"
+      ],
+      "sources": [
+        "https://www.anthropic.com/research/building-effective-agents"
+      ]
+    },
+    {
+      "number": 3,
+      "title": "같은 질문의 두 처리 과정",
+      "image": "/materials/day1/slide-03.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": "D01",
+      "text": [
+        "D01",
+        "등록된 Python 행사 목록을 알려줘.",
+        "두 요청의 질문이 같은지 확인",
+        "도구 실행이 있었는지 확인",
+        "행사 이름의 출처 찾기",
+        "모델 단독: 등록 목록을 확인할 수 없음",
+        "도구 사용: search_events(\"Python\")",
+        "실제 목록: E-101, E-102, E-103, E-105",
+        "agent_workshop/demos.py",
+        "python demo.py D01 --mode live",
+        "python demo.py D01 --mode mock"
+      ],
+      "sources": []
+    },
+    {
+      "number": 4,
+      "title": "요청을 처리하는 에이전트의 흐름",
+      "image": "/materials/day1/slide-04.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": null,
+      "text": [
+        "사용자 요청",
+        "모델의 행동 선택",
+        "프로그램의 도구 실행",
+        "관찰 결과",
+        "결과를 다시 모델 입력에 넣고, 다음 행동 또는 종료를 선택",
+        "개발 보조: 파일 확인과 테스트",
+        "고객 상담: 주문 조회와 처리"
+      ],
+      "sources": [
+        "https://www.anthropic.com/research/building-effective-agents"
+      ]
+    },
+    {
+      "number": 5,
+      "title": "실행 기록으로 보는 에이전트",
+      "image": "/materials/day1/slide-05.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": "D02",
+      "text": [
+        "D02",
+        "입문자에게 맞는 온라인 Python 행사를 추천해줘.",
+        "모델 입력과 도구 명세 펼치기",
+        "호출 이름·인자·결과 구분",
+        "최종 답변의 근거 찾기",
+        "search_events: 후보 목록 확인",
+        "get_event: E-101 상세 확인",
+        "get_event: E-102 상세 확인",
+        "최종 답변: E-102 추천",
+        "agent_workshop/loop.py",
+        "python demo.py D02 --mode live",
+        "python demo.py D02 --mode mock"
+      ],
+      "sources": []
+    },
+    {
+      "number": 6,
+      "title": "코드와 모델의 실행 위치",
+      "image": "/materials/day1/slide-06.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": null,
+      "text": [
+        "로컬에서 모델 실행",
+        "내 컴퓨터가 추론 자원을 관리",
+        "모델 파일과 실행 환경 준비",
+        "로컬 API로 제공할 수도 있음",
+        "외부 API로 모델 호출",
+        "서비스가 모델 추론을 수행",
+        "앱은 요청을 보내고 응답 처리",
+        "키·모델 ID·크레딧 필요",
+        "이번 수업: 에이전트 코드는 내 컴퓨터, 모델 추론은 학교 API"
+      ],
+      "sources": [
+        "https://docs.factchat.kr/docs/korea-seoul/api-gateway/reference/chat-completions"
+      ]
+    },
+    {
+      "number": 7,
+      "title": "학교 API의 최소 호출",
+      "image": "/materials/day1/slide-07.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": "D03",
+      "text": [
+        "D03",
+        "Python 입문자가 들을 만한 행사를 추천해줘.",
+        "model과 messages의 위치 확인",
+        "전송한 내용과 응답 비교",
+        "키가 코드·기록에 없는지 확인",
+        "model = KU_MODEL 환경 설정",
+        "messages = 지시문 + 사용자 요청",
+        "POST /v1/gateway/chat/completions/",
+        "응답: choices[0].message",
+        "stages/00_model.py",
+        "python demo.py D03 --mode live",
+        "python demo.py D03 --mode mock"
+      ],
+      "sources": []
+    },
+    {
+      "number": 8,
+      "title": "프롬프트와 메시지",
+      "image": "/materials/day1/slide-08.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": null,
+      "text": [
+        "messages = [\n  {\"role\": \"system\",\n   \"content\": \"확인한 정보만 한국어로 답한다.\"},\n  {\"role\": \"user\",\n   \"content\": \"Python 입문 행사를 추천해줘.\"}\n]",
+        "지시문: 역할과 응답 기준",
+        "사용자 메시지: 이번 요청",
+        "정보가 없으면 그 한계도 전달",
+        "지시문은 데이터 접근 권한이나 도구 실행을 대신하지 않음"
+      ],
+      "sources": [
+        "https://docs.factchat.kr/docs/korea-seoul/api-gateway/reference/chat-completions"
+      ]
+    },
+    {
+      "number": 9,
+      "title": "지시문 변경 전후 비교",
+      "image": "/materials/day1/slide-09.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": "D04",
+      "text": [
+        "D04",
+        "같은 질문에 답하는 형식만 바꿔보기",
+        "사용자 질문은 그대로 유지",
+        "지시문에 3줄 형식 추가",
+        "형식 변화와 사실 확인을 구분",
+        "추가 지시: 추천 방향·확인할 정보·다음 행동",
+        "추천 방향: Python 입문 행사",
+        "확인 필요: 실제 목록과 참가 조건",
+        "다음 단계: 행사 데이터 조회",
+        "stages/00_model.py",
+        "python demo.py D04 --mode live",
+        "python demo.py D04 --mode mock"
+      ],
+      "sources": []
+    },
+    {
+      "number": 10,
+      "title": "Tool Calling의 역할 분담",
+      "image": "/materials/day1/slide-10.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": null,
+      "text": [
+        "def search_events(query):\n    return matching_events(query)\n\ntool = {\n  \"name\": \"search_events\",\n  \"description\": \"행사 목록 검색\",\n  \"parameters\": {\"query\": \"문자열\"}\n}",
+        "함수: 프로그램이 실행",
+        "명세: 모델이 사용법을 읽음",
+        "요청: 모델이 이름·인자를 출력",
+        "위 명세는 설명용 축약형. 실제 JSON Schema는 tools.py"
+      ],
+      "sources": [
+        "https://www.anthropic.com/research/building-effective-agents",
+        "https://docs.factchat.kr/docs/korea-seoul/api-gateway/reference/chat-completions"
+      ]
+    },
+    {
+      "number": 11,
+      "title": "도구 요청과 함수 실행",
+      "image": "/materials/day1/slide-11.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": "D05",
+      "text": [
+        "D05",
+        "등록된 Python 행사 목록을 알려줘.",
+        "함수를 모델 없이 직접 실행",
+        "모델이 만든 이름과 인자 확인",
+        "프로그램의 실행 결과 비교",
+        "모델 요청: search_events",
+        "인자: {\"query\": \"Python\"}",
+        "프로그램 실행: LocalTools.execute(...)",
+        "반환: 4개 행사 ID와 제목",
+        "stages/01_tool_call.py",
+        "python demo.py D05 --mode live",
+        "python demo.py D05 --mode mock"
+      ],
+      "sources": []
+    },
+    {
+      "number": 12,
+      "title": "Agent Loop와 도구 결과 전달",
+      "image": "/materials/day1/slide-12.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": null,
+      "text": [
+        "모델 호출",
+        "도구 요청 확인",
+        "함수 실행",
+        "결과 메시지 추가",
+        "도구 요청이 있으면 반복하고, 최종 응답이면 종료",
+        "search_events: 후보 ID와 제목",
+        "get_event: 참가 형태와 상세 조건"
+      ],
+      "sources": [
+        "https://www.anthropic.com/research/building-effective-agents"
+      ]
+    },
+    {
+      "number": 13,
+      "title": "목록 조회 다음 상세 조회",
+      "image": "/materials/day1/slide-13.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": "D06",
+      "text": [
+        "D06",
+        "입문자에게 맞는 온라인 Python 행사를 찾아줘.",
+        "목록에 없는 상세 조건 확인",
+        "직전 결과를 다음 입력에서 찾기",
+        "최종 추천과 조건 대조",
+        "E-101: advanced / offline",
+        "E-102: beginner / online",
+        "선택 결과: E-102",
+        "모델 호출 사이에 도구 결과 전달",
+        "stages/02_agent_loop.py",
+        "python demo.py D06 --mode live",
+        "python demo.py D06 --mode mock"
+      ],
+      "sources": []
+    },
+    {
+      "number": 14,
+      "title": "종료 조건과 오류 처리",
+      "image": "/materials/day1/slide-14.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": null,
+      "text": [
+        "상황",
+        "프로그램의 처리",
+        "정상 최종 답변",
+        "완료로 종료",
+        "조회 결과 없음",
+        "없다고 알리거나 추가 질문",
+        "잘못된 도구·인자",
+        "실행을 막고 오류 결과 반환",
+        "최대 단계·호출 수 도달",
+        "미완료 상태와 종료 사유 기록",
+        "API 오류·시간 초과",
+        "오류 기록, 자동 무한 재시도 방지",
+        "예제 한도: 모델 6단계, 도구 요청 8회"
+      ],
+      "sources": []
+    },
+    {
+      "number": 15,
+      "title": "검색 실패와 단계 제한",
+      "image": "/materials/day1/slide-15.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": "D07",
+      "text": [
+        "D07",
+        "결과가 없거나 계속 조회하면 어떻게 끝날까?",
+        "없는 검색어의 결과 확인",
+        "반복 모델을 2단계에서 중단",
+        "잘못된 event_id 입력 거부",
+        "양자물리 검색: events = []",
+        "고장 주입: 같은 검색을 계속 요청",
+        "종료: max_steps / model_calls = 2",
+        "event_id가 숫자: invalid_arguments",
+        "agent_workshop/loop.py",
+        "python demo.py D07 --mode live",
+        "python demo.py D07 --mode mock"
+      ],
+      "sources": []
+    },
+    {
+      "number": 16,
+      "title": "20:05에 다시 시작합니다",
+      "image": "/materials/day1/slide-16.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": null,
+      "text": [
+        "다음은 MCP, RAG, Memory"
+      ],
+      "sources": []
+    },
+    {
+      "number": 17,
+      "title": "MCP의 연결 구조",
+      "image": "/materials/day1/slide-17.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": null,
+      "text": [
+        "도구를 제공하는 프로그램과 앱 사이의 공통 통신 방식"
+      ],
+      "sources": [
+        "https://modelcontextprotocol.io/docs/learn/architecture",
+        "https://github.com/modelcontextprotocol/python-sdk/tree/v1.26.0"
+      ]
+    },
+    {
+      "number": 18,
+      "title": "MCP 서버의 도구 목록",
+      "image": "/materials/day1/slide-18.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": "D08",
+      "text": [
+        "D08",
+        "준비된 서버는 어떤 도구를 제공할까?",
+        "실제 stdio 서버 연결",
+        "도구 이름과 입력 schema 확인",
+        "실행 직전에서 멈추기",
+        "연결: Workshop Event Tools",
+        "search_events(query: string)",
+        "get_event(event_id: string)",
+        "이번 구간: tools/list까지",
+        "mcp_server.py",
+        "python demo.py D08 --mode live",
+        "python demo.py D08 --mode mock"
+      ],
+      "sources": []
+    },
+    {
+      "number": 19,
+      "title": "Tool Calling과 MCP의 연결",
+      "image": "/materials/day1/slide-19.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": null,
+      "text": [
+        "Tool Calling",
+        "모델이 읽는 도구 명세",
+        "모델의 이름·인자 요청",
+        "도구 결과를 다음 입력에 전달",
+        "MCP",
+        "서버의 도구 목록 조회",
+        "Client가 서버 도구 호출",
+        "서버의 실제 실행 결과 반환",
+        "앱의 연결 코드가 두 흐름을 이어 줌"
+      ],
+      "sources": [
+        "https://modelcontextprotocol.io/docs/learn/architecture",
+        "https://docs.factchat.kr/docs/korea-seoul/api-gateway/reference/chat-completions"
+      ]
+    },
+    {
+      "number": 20,
+      "title": "MCP 도구로 행사 조회",
+      "image": "/materials/day1/slide-20.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": "D09",
+      "text": [
+        "D09",
+        "지금 등록된 Python 행사 목록을 알려줘.",
+        "모델의 도구 요청 확인",
+        "MCP 서버 호출과 반환값 확인",
+        "직접 함수 호출과 역할 비교",
+        "모델: search_events 요청",
+        "Client: call_tool(...)",
+        "Server: 행사 목록 4개 반환",
+        "모델: 반환값을 바탕으로 답변",
+        "stages/03_mcp.py",
+        "python demo.py D09 --mode live",
+        "python demo.py D09 --mode mock"
+      ],
+      "sources": []
+    },
+    {
+      "number": 21,
+      "title": "RAG의 검색 단계",
+      "image": "/materials/day1/slide-21.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": null,
+      "text": [
+        "규정 문서",
+        "문단 분할",
+        "관련 문단 검색",
+        "모델 입력에 추가",
+        "질문할 때 필요한 외부 정보를 찾아 응답에 사용",
+        "예제: 작은 Markdown 규정과 키워드 검색",
+        "확장: 임베딩과 벡터 검색"
+      ],
+      "sources": [
+        "https://docs.langchain.com/oss/python/deepagents/retrieval"
+      ]
+    },
+    {
+      "number": 22,
+      "title": "질문에 맞는 규정 문단 찾기",
+      "image": "/materials/day1/slide-22.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": "D10",
+      "text": [
+        "D10",
+        "1학년이고 Python 초보인데 E-102에 신청할 수 있어?",
+        "문서 원문과 검색 결과 비교",
+        "출처 ID가 남는지 확인",
+        "생성 호출 전에 멈추기",
+        "검색: E-102 신청 자격",
+        "출처: admission.md#1",
+        "내용: 1~4학년 모두 신청 가능",
+        "조건: Python 사전 경험 불필요",
+        "agent_workshop/knowledge.py",
+        "python demo.py D10 --mode live",
+        "python demo.py D10 --mode mock"
+      ],
+      "sources": []
+    },
+    {
+      "number": 23,
+      "title": "검색 문단을 답변의 근거로 사용하기",
+      "image": "/materials/day1/slide-23.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": null,
+      "text": [
+        "retrieval = search_policy(\"E-102 신청 자격\")\ncontext = json.dumps(retrieval)\n\nmodel_input = [\n  system_instruction,\n  retrieved_context,\n  user_question,\n]",
+        "관련 문단을 입력에 포함",
+        "출처 ID와 답변을 연결",
+        "근거가 없으면 확인 불가 처리",
+        "검색 결과와 생성한 답변의 일치 여부를 각각 확인"
+      ],
+      "sources": [
+        "https://docs.langchain.com/oss/python/deepagents/retrieval"
+      ]
+    },
+    {
+      "number": 24,
+      "title": "검색 결과를 넣어 답변 생성",
+      "image": "/materials/day1/slide-24.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": "D11",
+      "text": [
+        "D11",
+        "같은 질문에 규정을 제공하기 전과 후 비교",
+        "입력에 추가된 문단 확인",
+        "답변의 조건과 조항 대조",
+        "자료에 없는 질문도 확인",
+        "E-102: 1학년도 신청 가능",
+        "Python 사전 경험 불필요",
+        "근거: admission.md#1",
+        "주차 할인: 검색 결과 없음",
+        "stages/04_rag.py",
+        "python demo.py D11 --mode live",
+        "python demo.py D11 --mode mock"
+      ],
+      "sources": []
+    },
+    {
+      "number": 25,
+      "title": "대화 기록과 현재 입력",
+      "image": "/materials/day1/slide-25.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": null,
+      "text": [
+        "messages = [\n  user(\"온라인 행사를 선호해.\"),\n  assistant(\"이번 대화에서 참고할게요.\"),\n  user(\"내 선호가 뭐였지?\"),\n]\n\nnew_chat = [user(\"내 선호가 뭐였지?\")]",
+        "이전 발언도 입력의 일부",
+        "앱이 어떤 기록을 보낼지 결정",
+        "새 대화는 다른 입력으로 시작",
+        "답변이 같아도 기억 여부는 실제 입력을 보고 판단"
+      ],
+      "sources": [
+        "https://docs.langchain.com/oss/python/concepts/memory"
+      ]
+    },
+    {
+      "number": 26,
+      "title": "대화 기록을 비워보기",
+      "image": "/materials/day1/slide-26.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": "D12",
+      "text": [
+        "D12",
+        "내가 어떤 참가 방식을 선호했지?",
+        "선호 발언이 포함된 입력 확인",
+        "messages를 비운 입력 확인",
+        "정보가 전달됐는지 비교",
+        "기존 대화: 온라인 선호 발언 포함",
+        "새 대화: 선호 정보 없음",
+        "모의 응답: 선호를 다시 질문",
+        "판단 기준: 모델 입력의 차이",
+        "agent_workshop/demos.py",
+        "python demo.py D12 --mode live",
+        "python demo.py D12 --mode mock"
+      ],
+      "sources": []
+    },
+    {
+      "number": 27,
+      "title": "세션을 넘는 Memory",
+      "image": "/materials/day1/slide-27.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": null,
+      "text": [
+        "명시적 선호 저장",
+        "사용자별 JSON",
+        "새 대화에서 조회",
+        "입력에 다시 포함",
+        "현재 요청을 우선하고, 저장된 정보는 수정·삭제 가능하게 설계",
+        "장기 선호: 온라인 행사",
+        "이번 요청: 대면 행사로 찾아줘"
+      ],
+      "sources": [
+        "https://docs.langchain.com/oss/python/concepts/memory"
+      ]
+    },
+    {
+      "number": 28,
+      "title": "프로필을 저장하고 새 대화에서 사용하기",
+      "image": "/materials/day1/slide-28.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": "D13",
+      "text": [
+        "D13",
+        "온라인 선호를 기억하고, 이번에는 대면 행사도 찾아보기",
+        "새 저장소 객체로 프로필 재조회",
+        "새 messages에 프로필 삽입",
+        "일회성 요청 후 저장값 확인",
+        "저장: grade = 1, preferred_mode = online",
+        "새 대화 추천: E-102 온라인 입문",
+        "이번 대면 요청: E-103 대면 입문",
+        "저장된 장기 선호: online 유지",
+        "stages/05_memory.py",
+        "python demo.py D13 --mode live",
+        "python demo.py D13 --mode mock"
+      ],
+      "sources": []
+    },
+    {
+      "number": 29,
+      "title": "하나의 요청에 연결되는 구성요소",
+      "image": "/materials/day1/slide-29.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": null,
+      "text": [
+        "필요한 기능만 연결하고 실제 실행 결과를 확인"
+      ],
+      "sources": [
+        "https://www.anthropic.com/research/building-effective-agents"
+      ]
+    },
+    {
+      "number": 30,
+      "title": "선호와 규정을 함께 반영하기",
+      "image": "/materials/day1/slide-30.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": "D14",
+      "text": [
+        "D14",
+        "나에게 맞는 Python 입문 행사와 신청 근거를 알려줘.",
+        "프로필로 사용자 조건 확인",
+        "행사 상세와 규정 검색 확인",
+        "추천·자격·출처의 일치 확인",
+        "프로필: 1학년, 온라인 선호",
+        "행사: E-102 처음 배우는 Python",
+        "자격: 1~4학년, 사전 경험 불필요",
+        "근거: admission.md#1",
+        "stages/05_memory.py",
+        "python demo.py D14 --mode live",
+        "python demo.py D14 --mode mock"
+      ],
+      "sources": []
+    },
+    {
+      "number": 31,
+      "title": "자신의 아이디어로 바꿀 부분",
+      "image": "/materials/day1/slide-31.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": null,
+      "text": [
+        "바꿀 요소",
+        "코드·자료 위치",
+        "예시",
+        "지시문",
+        "loop.py의 SYSTEM",
+        "책 추천 비서 역할",
+        "도구",
+        "tools.py와 knowledge.py",
+        "도서 목록 조회",
+        "지식",
+        "data/policies/*.md",
+        "대출·신청 규정",
+        "기억",
+        "memory.py의 프로필",
+        "선호 분야와 읽은 책",
+        "자율 제작이며 제출 과제 없음. 내일은 공통 기본 코드로 시작"
+      ],
+      "sources": []
+    },
+    {
+      "number": 32,
+      "title": "2일차 공통 미션",
+      "image": "/materials/day1/slide-32.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": null,
+      "text": [
+        "가상 쇼핑몰 CS 에이전트",
+        "주문 취소와 반품 요청 처리",
+        "주문 상태와 정책 확인",
+        "정보가 부족하면 질문",
+        "평가에서 확인할 것",
+        "요청한 주문을 정확히 조회",
+        "정책에 맞는 행동 선택",
+        "올바른 상태 변경과 종료",
+        "예정 운영: 웹 코드 제출 후 학생 브라우저에서 실행·평가·채점"
+      ],
+      "sources": []
+    },
+    {
+      "number": 33,
+      "title": "부록 A1 · 최소 Agent Loop",
+      "image": "/materials/day1/slide-33.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": null,
+      "text": [
+        "for step in range(max_steps):\n    reply = await model.chat(history, tools)\n    if not reply.tool_calls:\n        return reply.content\n    history.append(reply)\n    for call in reply.tool_calls:\n        result = await execute_allowed(call)\n        history.append(tool_result(call.id, result))\nreturn \"단계 한도 도달\"",
+        "설명용 의사 코드",
+        "실행 코드: agent_workshop/loop.py",
+        "인자 검증·타임아웃·호출 한도 포함",
+        "도구 요청 ID와 결과 메시지 ID를 대응"
+      ],
+      "sources": []
+    },
+    {
+      "number": 34,
+      "title": "부록 A2 · API 호출 점검",
+      "image": "/materials/day1/slide-34.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": null,
+      "text": [
+        "관찰한 증상",
+        "확인할 항목",
+        "키·모델 설정 오류",
+        ".env의 KU_API_KEY와 KU_MODEL",
+        "401 / 403",
+        "키 또는 모델 접근 권한",
+        "429 / 크레딧 오류",
+        "개인 크레딧·호출 제한",
+        "빈 응답 / length 종료",
+        "모델의 출력·추론 토큰 예산",
+        "도구를 사용하지 않음",
+        "선택 모델의 tools 지원과 지시문",
+        "시연 중 연결이 지연되면 명시적으로 모의 모드로 전환"
+      ],
+      "sources": [
+        "https://docs.factchat.kr/docs/korea-seoul/api-gateway/reference/chat-completions",
+        "https://docs.factchat.kr/docs/korea-seoul/api-gateway/getting-started/authentication"
+      ]
+    },
+    {
+      "number": 35,
+      "title": "부록 A3 · 용어와 실행 범위",
+      "image": "/materials/day1/slide-35.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": null,
+      "text": [
+        "용어",
+        "수업에서 맡는 역할",
+        "Tool Calling",
+        "모델의 도구 이름·인자 요청",
+        "Agent Loop",
+        "결과를 다시 전달하며 반복·종료 제어",
+        "MCP",
+        "도구 제공 프로그램과 연결",
+        "RAG",
+        "관련 지식을 찾아 모델 입력에 제공",
+        "Memory",
+        "이전 정보를 저장하고 다시 사용",
+        "이 시연: 로컬 Python. 2일차 브라우저 실행 환경은 별도 제공"
+      ],
+      "sources": []
+    },
+    {
+      "number": 36,
+      "title": "부록 A4 · 자료와 공식 문서",
+      "image": "/materials/day1/slide-36.webp",
+      "width": 1600,
+      "height": 900,
+      "demo": null,
+      "text": [
+        "실행 코드",
+        "day1/code · README.md에서 시작",
+        "Agent 구조",
+        "anthropic.com/research/building-effective-agents",
+        "학교 API",
+        "docs.factchat.kr · 고려대학교 API Gateway",
+        "MCP",
+        "modelcontextprotocol.io/docs/learn/architecture",
+        "RAG와 Memory",
+        "docs.langchain.com · Retrieval / Memory overview",
+        "강사용 진행 노트와 단계별 코드에 전체 링크 수록"
+      ],
+      "sources": [
+        "https://www.anthropic.com/research/building-effective-agents",
+        "https://docs.factchat.kr/docs/korea-seoul/api-gateway/reference/chat-completions",
+        "https://docs.factchat.kr/docs/korea-seoul/api-gateway/getting-started/authentication",
+        "https://modelcontextprotocol.io/docs/learn/architecture",
+        "https://github.com/modelcontextprotocol/python-sdk/tree/v1.26.0",
+        "https://docs.langchain.com/oss/python/deepagents/retrieval",
+        "https://docs.langchain.com/oss/python/concepts/memory"
+      ]
+    }
+  ]
+}

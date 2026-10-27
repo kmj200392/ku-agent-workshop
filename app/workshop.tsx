@@ -1,9 +1,9 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
-import LectureMaterials from './lecture-materials';
-import DemoPanel, {demoMeta as meta} from './demo-panel';
-import {ArrowRight,BookOpen,Check,CheckCircle2,ChevronRight,Code2,Columns2,Download,FileCode2,FlaskConical,KeyRound,LoaderCircle,Play,Plus,RefreshCw,Settings2,ShieldCheck,Square,Terminal,Trophy,Upload,X,XCircle} from 'lucide-react';
-const nav=[['arena','워크스페이스',Code2],['leaderboard','리더보드',Trophy],['materials','강의자료',BookOpen],['demos','강의 시연',Play],['guide','과제 · 사용 가이드',BookOpen]] as const;
+import WebLecture, {type TraceEvent} from './web-lecture';
+import {workshopView} from '../lib/web-lecture';
+import {ArrowRight,BookOpen,Check,CheckCircle2,ChevronRight,Code2,Download,FileCode2,FlaskConical,KeyRound,LoaderCircle,Play,RefreshCw,Settings2,ShieldCheck,Square,Terminal,Trophy,Upload,X} from 'lucide-react';
+const nav=[['lesson','1일차 강의',BookOpen],['arena','워크스페이스',Code2],['leaderboard','리더보드',Trophy],['guide','과제 · 사용 가이드',BookOpen]] as const;
 const storageKey=(k:string)=>'ku-agent:'+(['code','last-result','pending'].includes(k)?'bfcl-travel-v1:':'')+k;
 const storage={get:(k:string,fallback:any)=>{try{return JSON.parse(localStorage.getItem(storageKey(k))||'null')??fallback;}catch{return fallback;}},set:(k:string,v:any)=>{try{localStorage.setItem(storageKey(k),JSON.stringify(v));return true;}catch{return false;}}};
 async function api(path:string,data?:any):Promise<any>{const r=await fetch('/api/'+path,data===undefined?{cache:'no-store'}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});const d:any=await r.json();if(!r.ok)throw Error(d.error||'요청 실패');return d;}
@@ -12,19 +12,18 @@ function download(name:string,data:string,type='text/plain'){const url=URL.creat
 const statusText=(s:string)=>({completed:'평가 완료',error:'실행 오류 · 순위 미반영',aborted:'중단됨 · 순위 미반영',running:'실행 중',expired:'마감 후 완료 · 순위 미반영',pass:'통과',fail:'실패'}[s]||s);
 const fmt=(n:number)=>`${(n/1000).toFixed(1)}초`;
 export default function Workshop(){
- const [view,setView]=useState('arena'),[config,setConfig]=useState<any>(null),[code,setCode]=useState(''),[key,setKey]=useState(''),[nickname,setNickname]=useState(''),[me,setMe]=useState<any>(null),[settings,setSettings]=useState(false),[notice,setNotice]=useState(''),[ready,setReady]=useState(false);
+ const [view,setView]=useState('lesson'),[config,setConfig]=useState<any>(null),[code,setCode]=useState(''),[key,setKey]=useState(''),[nickname,setNickname]=useState(''),[me,setMe]=useState<any>(null),[settings,setSettings]=useState(false),[notice,setNotice]=useState(''),[ready,setReady]=useState(false);
  const [authMode,setAuthMode]=useState('register'),[accessCode,setAccessCode]=useState(''),[issuedCode,setIssuedCode]=useState(''),[authBusy,setAuthBusy]=useState(false),[authError,setAuthError]=useState('');
  const [busy,setBusy]=useState(false),[stage,setStage]=useState(''),[current,setCurrent]=useState(''),[records,setRecords]=useState<any[]>([]),[result,setResult]=useState<any>(null),[pending,setPending]=useState<any>(null),[suite,setSuite]=useState<any[]>([]),[activeCases,setActiveCases]=useState<any[]>([]),[expanded,setExpanded]=useState(''),[board,setBoard]=useState<any>(null),[boardKind,setBoardKind]=useState('practice'),[boardError,setBoardError]=useState('');
- const [materialsSplit,setMaterialsSplit]=useState(false);
+ const [demoProgress,setDemoProgress]=useState<TraceEvent[]>([]);
  const [demo,setDemo]=useState('D01'),[demoMode,setDemoMode]=useState('live'),[demoResult,setDemoResult]=useState<any>(null),[demoBusy,setDemoBusy]=useState(false),[demoStatus,setDemoStatus]=useState('');
  const abortRef=useRef<null|(()=>void)>(null),demoAbort=useRef<AbortController|null>(null),finalAttempt=useRef(false),busyRef=useRef(false),keyRef=useRef(''),pendingRef=useRef<any>(null),fileRef=useRef<HTMLInputElement>(null);
  keyRef.current=key;pendingRef.current=pending;
  const refreshMe=async()=>{const d=await api('me');setMe(d);if(d.participant)setNickname(d.participant.nickname);};
  const refreshBoard=async(kind=boardKind)=>{try{setBoard(await api('leaderboard?kind='+kind));setBoardError('');}catch(e:any){setBoardError(e.message);}};
  useEffect(()=>{
-  const hash=location.hash.slice(1);if(nav.some(n=>n[0]===hash))setView(hash);
-  const handleHash=()=>{const h=location.hash.slice(1);if(nav.some(n=>n[0]===h))setView(h);};window.addEventListener('hashchange',handleHash);
-  setMaterialsSplit(storage.get('materials-split',false)===true);
+  const hash=workshopView(location.hash);if(nav.some(n=>n[0]===hash))setView(hash);
+  const handleHash=()=>{const h=workshopView(location.hash);if(nav.some(n=>n[0]===h))setView(h);};window.addEventListener('hashchange',handleHash);
   setCode(storage.get('code',''));setResult(storage.get('last-result',null));setPending(storage.get('pending',null));setDemo(storage.get('demo-selected','D01'));setDemoMode(storage.get('demo-mode','live'));
   Promise.all([api('config'),api('suite'),fetch('/starter.py').then(r=>r.text()),refreshMe()]).then(([c,s,starter])=>{setConfig(c);setSuite(s.cases);setCode((old:string)=>old||starter);setReady(true);}).catch((e:any)=>{setNotice(e.message);setReady(true);});
   const onUnload=(e:BeforeUnloadEvent)=>{if(busyRef.current){e.preventDefault();e.returnValue='';}};window.addEventListener('beforeunload',onUnload);
@@ -39,8 +38,6 @@ export default function Workshop(){
  },[view,boardKind]);
  useEffect(()=>{if(config?.phase==='final'&&me?.participant&&key&&!busy&&!finalAttempt.current&&!pending){finalAttempt.current=true;start(true);}},[config?.phase,me?.participant,key,busy,pending]);
  function navigate(v:string){location.hash=v;setView(v);}
- function changeMaterialsLayout(split:boolean){setMaterialsSplit(split);storage.set('materials-split',split);}
- function openDemoAlongside(id?:string){if(id&&demoBusy)return;if(id)setDemo(id);changeMaterialsLayout(true);navigate('materials');}
  async function upload(payload:any){try{const d=await api('finish',payload);setPending(null);storage.set('pending',null);setResult((old:any)=>{if(old?.runId===payload.runId){const next={...old,uploaded:true,...(d.late?{status:'expired'}:{})};storage.set('last-result',next);return next;}return old;});await refreshMe();return d;}catch(e:any){setNotice('결과는 브라우저에 보관했어요. 업로드 재시도: '+e.message);return null;}}
  async function start(final=false){
   if(busyRef.current||demoBusy)return;
@@ -76,15 +73,14 @@ export default function Workshop(){
   catch(e:any){setAuthError(e.message);}
  }
  async function runDemonstration(){
-  if(demoBusy||busy)return;const id=demo;
+  if(demoBusy||busy)return;const id=demo;setDemoProgress([]);
   if(demoMode==='record'){setDemoBusy(true);try{const response=await fetch(`/demos/${id}.json`);if(!response.ok)throw Error('기록 로드 실패');const d=await response.json();setDemoResult(d);storage.set(`demo:record:${id}`,d);setDemoStatus('미리 생성한 모의 실행 기록 · API 호출 없음');}catch{setDemoStatus('기록을 불러오지 못했습니다.');}finally{setDemoBusy(false);}return;}
   if(!key&&!['D08','D10'].includes(id)){if(document.fullscreenElement){try{await document.exitFullscreen();}catch{}}setSettings(true);setNotice('실제 모델 시연에는 학교 API 키가 필요합니다.');return;}
   setDemoBusy(true);setDemoStatus('브라우저에서 시연 실행 중…');const ctl=new AbortController();demoAbort.current=ctl;const timer=setTimeout(()=>ctl.abort(),240000);
-  try{const module=await import('../lib/browser-demo.mjs');const d=await module.runDemo(id,{key,config,signal:ctl.signal,onEvent:(e:any)=>setDemoStatus(`${e.seq}. ${e.label}`)});storage.set(`demo:live:${id}`,d);if(id===demo)setDemoResult(d);setDemoStatus('실행 완료 · 다른 페이지로 이동해도 유지됩니다.');}
+  try{const module=await import('../lib/browser-demo.mjs');const d=await module.runDemo(id,{key,config,signal:ctl.signal,onEvent:(e:any)=>{setDemoProgress(old=>[...old,e]);setDemoStatus(`${e.seq}. ${e.label}`);}});storage.set(`demo:live:${id}`,d);if(id===demo)setDemoResult(d);setDemoStatus('실행 완료 · 다른 페이지로 이동해도 유지됩니다.');}
   catch(e:any){setDemoStatus('실행 실패 · 기존 결과 유지: '+e.message);}finally{clearTimeout(timer);setDemoBusy(false);demoAbort.current=null;}
  }
  const shownRecords=busy?records:result?.cases||[];const passed=shownRecords.filter((r:any)=>r.status==='pass').length;
- const renderDemo=(compact=false)=><DemoPanel compact={compact} demo={demo} mode={demoMode} result={demoResult} busy={demoBusy} runDisabled={demoBusy||busy||!config} status={demoStatus} onSelect={id=>{if(!demoBusy)setDemo(id);}} onModeChange={mode=>{if(!demoBusy)setDemoMode(mode);}} onRun={runDemonstration} onStop={()=>demoAbort.current?.abort()} onDownload={()=>download(`${demo}-${demoMode}.json`,JSON.stringify(demoResult,null,2),'application/json')}/>;
  return <div className="shell">
   <aside className="sidebar"><a className="brand" href="#arena" onClick={()=>navigate('arena')}><span className="brand-mark"><Code2 size={23}/></span><span>KU Agent Lab<small>GDGoC KOREA UNIVERSITY</small></span></a>
    <div className="course-tag"><span className="dot"/>2026. 10. 28 — 29<span className="tag">WORKSHOP</span></div>
@@ -116,11 +112,7 @@ export default function Workshop(){
     <div className="panel leaderboard"><div className="panel-header"><div><Trophy size={18}/><b>{boardKind==='practice'?'연습':'최종'} 순위</b><span className="count-badge">{board?.entries?.length??0}명</span></div><span className="subtle">동점은 공동 순위</span></div><div className="table-wrap"><table><thead><tr><th>순위</th><th>참가자</th><th>통과 점수</th><th>모델 호출</th><th>도구 호출</th><th>실행 시간</th><th>코드 버전</th></tr></thead><tbody>{board?.entries?.map((r:any)=><tr key={r.id}><td><span className={r.rank<=3?'rank top':'rank'}>{r.rank===1?<Trophy size={18}/>:r.rank}</span></td><td><b>{r.nickname}</b></td><td><div className="score-cell"><b>{r.score}<span> / {r.total}</span></b><i style={{width:`${r.score/Math.max(r.total,1)*80}px`}}/></div></td><td>{r.model_calls}회</td><td>{r.tool_calls}회</td><td>{fmt(r.elapsed)}</td><td><code>{r.hash}</code></td></tr>)}</tbody></table></div>{!board?.entries?.length&&<div className="empty"><div className="empty-icon"><Trophy size={28}/></div><h3>{boardKind==='final'?'최종 평가 결과가 아직 없어요':'아직 등록된 점수가 없어요'}</h3><p>{boardKind==='final'?'10월 29일 20:35부터 고정된 코드로 평가합니다.':'첫 에이전트를 제출하고 리더보드에 이름을 올려보세요.'}</p><button className="button secondary" onClick={()=>navigate('arena')}>워크스페이스로 <ArrowRight size={14}/></button></div>}</div>
     <div className="info-grid"><div className="panel info-card"><h3>점수는 어떻게 정하나요?</h3><p>연습 6개·최종 20개에서 모든 턴을 통과한 케이스 수가 점수입니다. BFCL 기반 수업용 점수이며 공식 전체 점수와 다릅니다. 연습 순위는 개인 최고점, 최종 순위는 마감 시 고정한 코드의 점수입니다. 호출 수와 시간은 참고 정보입니다.</p></div><div className="panel info-card"><h3>학습용 리더보드입니다</h3><p>학생 브라우저가 계산한 결과를 저장합니다. 평가 데이터와 채점 로직을 로컬에서 볼 수 있으므로 변조를 독립적으로 검증하는 대회 시스템은 아닙니다.</p></div></div>
    </>}
-   {view==='materials'&&<LectureMaterials split={materialsSplit} onLayoutChange={changeMaterialsLayout} onOpenDemo={openDemoAlongside} demoBusy={demoBusy} demoPanel={renderDemo(true)}/>}
-   {view==='demos'&&<>
-    <div className="page-heading"><div><div className="eyebrow">DAY 01 · LEARN BY WATCHING</div><h1>한 단계씩, 에이전트 만들기.</h1><p>같은 행사 비서에 도구, 검색, 기억을 더하며 실행 흐름을 관찰하세요.</p></div><div className="materials-downloads"><button className="button secondary" onClick={()=>openDemoAlongside()}><Columns2 size={15}/>자료와 함께 보기</button><a className="button secondary" href="/day1-materials.zip" download><Download size={15}/>강의자료 · 원본 코드</a></div></div>
-    <div className="demo-layout"><div className="panel demo-menu">{meta.map(([id,title])=><button disabled={demoBusy} className={demo===id?'selected':''} key={id} onClick={()=>setDemo(id)}><span>{id}</span>{title}{demo===id&&<ChevronRight size={14}/>}</button>)}</div>{renderDemo()}</div>
-   </>}
+   {view==='lesson'&&<WebLecture demo={demo} mode={demoMode} result={demoBusy&&demoMode==='live'?{events:demoProgress}:demoResult?.demo===demo?demoResult:null} busy={demoBusy} runDisabled={demoBusy||busy||(demoMode==='live'&&!['D08','D10'].includes(demo)&&!config)} status={demoStatus} onSelect={id=>{if(!demoBusy)setDemo(id);}} onModeChange={mode=>{if(!demoBusy)setDemoMode(mode);}} onRun={runDemonstration} onStop={()=>demoAbort.current?.abort()} onDownload={()=>download(`${demo}-${demoMode}.json`,JSON.stringify(demoResult,null,2),'application/json')} onHackathon={()=>navigate('arena')}/>}
    {view==='guide'&&<>
     <div className="page-heading"><div><div className="eyebrow">MISSION BRIEF · BFCL TRAVEL V1</div><h1>무엇을 만들면 되나요?</h1><p>여러 턴의 요청을 기억하고 가상 여행 업무를 처리하는 Python 에이전트를 만듭니다.</p></div><a href="/starter.py" download className="button secondary"><Download size={15}/>시작 코드</a></div>
     <div className="guide-grid"><section className="panel guide-card"><span className="guide-number">01</span><h2>시작하기</h2><ol><li>참가 설정에서 닉네임을 등록하고 발급된 개인 참가 코드를 보관합니다. 이미 참가했다면 코드로 접속합니다.</li><li><a href="https://llm.korea.ac.kr/dashboard/chat/40882" target="_blank" rel="noreferrer">고려대학교 LLM 서비스</a>의 개인 API 키를 입력합니다.</li><li>시작 코드를 수정하거나 .py 파일을 불러옵니다.</li><li>‘제출하고 평가’를 누르면 나머지는 자동으로 진행됩니다.</li></ol><p className="small-callout">Python 설치나 GPU가 필요하지 않습니다. 첫 실행에는 브라우저 Python 런타임을 내려받습니다. API 키는 새로고침하면 다시 입력해야 합니다.</p></section>

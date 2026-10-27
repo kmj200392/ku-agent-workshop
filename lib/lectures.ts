@@ -18,7 +18,7 @@ export const lectures: readonly Lecture[] = [{
   organization: 'GDGoC KOREA UNIVERSITY',
   dates: '2026. 10. 28 – 29',
   time: '19:00 – 21:00 · 2일',
-  tags: ['입문', '강의 · 시연', '개인 해커톤'],
+  tags: ['입문', '인터랙티브 강의', '개인 해커톤'],
   coverTitle: 'AI Agent',
   coverSubtitle: 'From concepts to working agents.',
 }];

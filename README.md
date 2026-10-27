@@ -31,6 +31,6 @@ To add a lecture, create its `app/<slug>/page.tsx` route and add its information
 
 ## In-browser lecture materials
 
-`/agents#materials` displays the original Day 1 deck with a table of contents, keyboard navigation, fullscreen, text alternatives and page resume. PDF and ZIP downloads remain available. Static WebP slides avoid PDF plugin requirements and on-demand image transforms.
+`/agents#materials` displays the original Day 1 deck with a table of contents, keyboard navigation, fullscreen and page resume. The “자료 + 시연” mode places slides beside the same demo controls and saved traces; switching layouts never starts a demo or clears its result. The latest layout is restored on return, and both panes can be opened fullscreen. PDF and ZIP downloads remain available. Static WebP slides avoid PDF plugin requirements and on-demand image transforms.
 
 After replacing `public/day1-materials.zip`, regenerate assets with `python3 scripts/build-lecture-materials.py` (Poppler and Pillow required locally). The script verifies page counts, preserves the original PDF bytes and excludes instructor notes from the text manifest. Page resume is versioned by the PDF hash.

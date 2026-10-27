@@ -1,0 +1,51 @@
+{
+  "demo": "D10",
+  "mode": "mock",
+  "disclosure": "교육용 모의 모델. 응답 선택은 규칙으로 재현하며 실제 LLM 추론이 아닙니다.",
+  "events": [
+    {
+      "seq": 1,
+      "kind": "intro",
+      "label": "규정 문단 검색",
+      "data": {
+        "slide": 22,
+        "fixture": "수업용 가상 데이터"
+      }
+    },
+    {
+      "seq": 2,
+      "kind": "retrieval",
+      "label": "키워드 검색 결과",
+      "data": {
+        "query": "E-102 신청 자격",
+        "matches": [
+          {
+            "source": "admission.md#1",
+            "heading": "1 Python 입문 행사",
+            "text": "E-102 ‘처음 배우는 Python’과 E-103 ‘Python 입문 페어 프로그래밍’은 1~4학년 모두 신청할 수 있다. Python 사전 경험을 요구하지 않는다. 온라인 선호자는 E-102, 대면 선호자는 E-103을 선택할 수 있다.",
+            "score": 9
+          },
+          {
+            "source": "registration.md#2",
+            "heading": "2 준비물",
+            "text": "E-102와 E-103 참가자는 개인 노트북을 준비한다. E-102 온라인 접속 주소는 별도 안내 대상이다. 이 가상 데이터에는 실제 접속 링크가 없으며 링크를 만들어 알려주지 않는다.",
+            "score": 8
+          },
+          {
+            "source": "admission.md#2",
+            "heading": "2 심화 행사",
+            "text": "E-101 ‘Python 데이터 분석 심화’와 E-105 ‘Python으로 실험하는 검색 모델’은 2~4학년만 신청할 수 있다. Python의 변수, 조건문, 반복문을 사용할 수 있어야 한다. 1학년은 이 두 행사에 신청할 수 없다.",
+            "score": 1
+          }
+        ],
+        "method": "keyword overlap, no embeddings"
+      }
+    },
+    {
+      "seq": 3,
+      "kind": "checkpoint",
+      "label": "여기서 설명으로 돌아갑니다",
+      "data": "이 결과를 모델 입력에 넣는 위치를 설명한 뒤 D11을 실행합니다."
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+[
+  {"id":"E-101","title":"Python 데이터 분석 심화","tags":["python","데이터","심화"],"mode":"offline","level":"advanced","grades":[2,3,4],"date":"2026-11-01","time":"15:00","location":"가상 강의실 A","capacity":20},
+  {"id":"E-102","title":"처음 배우는 Python","tags":["python","입문","초보"],"mode":"online","level":"beginner","grades":[1,2,3,4],"date":"2026-11-02","time":"18:00","location":"가상 온라인 세미나","capacity":30},
+  {"id":"E-103","title":"Python 입문 페어 프로그래밍","tags":["python","입문","초보"],"mode":"offline","level":"beginner","grades":[1,2,3,4],"date":"2026-11-03","time":"16:00","location":"가상 강의실 B","capacity":16},
+  {"id":"E-104","title":"JavaScript로 만드는 웹 페이지","tags":["javascript","웹","입문"],"mode":"online","level":"beginner","grades":[1,2,3,4],"date":"2026-11-04","time":"18:00","location":"가상 온라인 세미나","capacity":25},
+  {"id":"E-105","title":"Python으로 실험하는 검색 모델","tags":["python","검색","심화"],"mode":"online","level":"advanced","grades":[2,3,4],"date":"2026-11-05","time":"17:00","location":"가상 온라인 세미나","capacity":20},
+  {"id":"E-106","title":"개발 진로 이야기","tags":["진로","개발"],"mode":"offline","level":"all","grades":[1,2,3,4],"date":"2026-11-06","time":"16:00","location":"가상 강의실 C","capacity":40}
+]

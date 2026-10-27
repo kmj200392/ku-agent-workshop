@@ -3,7 +3,7 @@
 This checkout runs independently from ChatGPT Sites.
 
 - Hosting: GitHub → Vercel (Next.js, Node24)
-- Address: https://agent.minjaek.im (Cloudflare DNS)
+- Address: https://lectures.minjaek.im (Cloudflare DNS)
 - Storage: Turso SQLite on the free Starter plan
 - Identity: nickname + generated personal participant code; HttpOnly session cookies
 - Execution: Python/Pyodide, tools and BFCL grading remain browser-local

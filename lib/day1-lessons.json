@@ -287,20 +287,6 @@
   },
   {
     "concept": {
-      "title": "20:05에 다시 시작합니다",
-      "layout": "break",
-      "subtitle": "다음은 MCP, RAG, Memory"
-    },
-    "start": "19:55",
-    "end": "20:05",
-    "minutes": 10,
-    "sourcePages": [
-      16
-    ],
-    "sources": []
-  },
-  {
-    "concept": {
       "title": "MCP의 연결 구조",
       "layout": "mcp",
       "bottom": "도구를 제공하는 프로그램과 앱 사이의 공통 통신 방식"

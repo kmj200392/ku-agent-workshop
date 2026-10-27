@@ -35,7 +35,7 @@ try {
  await page.getByText('admission.md#1',{exact:true}).waitFor();
  await page.reload();await page.getByText('admission.md#1',{exact:true}).waitFor();
  assert.equal(await page.evaluate(()=>localStorage.getItem('ku-agent:demo:live:D10')),live);
- await button('발표 모드').click();await button('전체 화면 닫기').waitFor();
+ await button('전체화면').click();await button('전체 화면 닫기').waitFor();
  assert.ok(await page.locator('.web-lecture').evaluate(el=>el.getBoundingClientRect().left===0));
  await page.screenshot({path:'outputs/web-lecture/presentation.png'});
  await button('전체 화면 닫기').click();
@@ -51,10 +51,10 @@ try {
  await page.setViewportSize({width:390,height:844});
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'mobile page must not overflow horizontally');
  await page.screenshot({path:'outputs/web-lecture/mobile.png',fullPage:true});
- await button('목차 06 / 19').click();await page.getByRole('button',{name:/18.*다음은 직접 만들 차례.*3분/}).click();
+ await button('목차 06 / 18').click();await page.getByRole('button',{name:/17.*다음은 직접 만들 차례.*3분/}).click();
  await page.getByRole('heading',{name:'BFCL 여행 예약 에이전트',exact:true}).waitFor();
  await button('해커톤 워크스페이스 열기').click();await button('제출하고 평가').waitFor();
- await page.goto(base+'/agents#materials');await button('목차 18 / 19').waitFor();
+ await page.goto(base+'/agents#materials');await button('목차 17 / 18').waitFor();
  assert.equal(await page.getByRole('button',{name:'강의 시연',exact:true}).count(),0);
  assert.deepEqual(errors,[]);assert.deepEqual(modelRequests,[]);
  console.log(JSON.stringify({status:'passed',checks:['recorded/live persistence','navigation/reload','trace expansion','fullscreen','MCP message transport','RAG chunks','mobile overflow','Day 2 handoff','legacy hash'],pageErrors:errors,paidModelRequests:modelRequests.length}));

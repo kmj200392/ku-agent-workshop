@@ -2,10 +2,10 @@
 
 The default `/agents` view is now a single web lecture, with explanations and executable examples in the same topic. `#lesson/<id>` links open individual topics; old `#materials` and `#demos` links open the unified lecture. Day 2 routes and school API configuration remain unchanged.
 
-- 19 topics preserve the original 120-minute schedule, including the break and references. All 14 examples remain available.
+- 18 topics include the references, with the standalone break page removed. All 14 examples remain available.
 - Native React text, diagrams, code excerpts and tables replace slide images. Concept and execution share the desktop layout; narrow screens stack them. Long results and trace details are expandable/scrollable.
 - Results retain the existing per-example, per-mode browser storage keys. The active topic is stored separately. No API request starts just by changing topics.
-- Presentation mode requests native fullscreen and falls back to a viewport layout when unavailable. Escape exits; arrow keys change topics when the lecture container has focus.
+- Fullscreen uses a viewport-height layout with fixed navigation and adaptive content spacing. Long results, traces and expanded references scroll inside their own panels. Native fullscreen falls back to the same layout when unavailable; the underlying page is locked until exit. Escape exits; arrow keys change topics when the lecture container has focus.
 - Recorded examples are explicitly marked as pre-generated rule-based output. Live MCP discovery and retrieval need no API key. Other live examples use the existing school API transport.
 - Browser event logging snapshots mutable model inputs. Event searches expose IDs/titles, requiring a detail lookup; policy search returns cited Markdown sections, matching the teaching progression and original Python example.
 

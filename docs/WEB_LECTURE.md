@@ -1,6 +1,6 @@
 # Native Day 1 lecture
 
-The default `/agents` view is now a single web lecture, with explanations and executable examples in the same topic. `#lesson/<id>` links open individual topics; old `#materials` and `#demos` links open the unified lecture. Day 2 routes remain unchanged. Both the lecture and evaluation use the provider selected in the API settings.
+The default `/agents` view is the five-page course introduction: cover, instructor, course goals, two-day flow and preparation. The first sidebar tab opens this deck; `#intro/<id>` links address its pages, with a separate browser resume key. It uses the same lecture navigation and fullscreen styling. Its final page links to API settings and `#lesson/start`. Day 1 remains a single web lecture, with explanations and executable examples in the same topic. `#lesson/<id>` links open individual topics; old `#materials` and `#demos` links open the unified lecture. Day 2 routes remain unchanged. Both the lecture and evaluation use the provider selected in the API settings.
 
 - 18 topics include the references, with the standalone break page removed. All 14 examples remain available.
 - Native React text, diagrams, code excerpts and tables replace slide images. Concept and execution share the desktop layout; narrow screens stack them. Long results and trace details are expandable/scrollable.

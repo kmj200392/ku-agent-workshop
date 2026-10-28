@@ -1,0 +1,59 @@
+'use client';
+import {useEffect,useRef,useState} from 'react';
+import {ArrowRight,BookOpen,Check,ChevronDown,ChevronLeft,ChevronRight,Code2,ExternalLink,FlaskConical,GraduationCap,KeyRound,List,Maximize2,MessageSquare,Terminal,Trophy,Workflow,Wrench} from 'lucide-react';
+import {MODEL_PROVIDERS} from '../lib/model-providers.mjs';
+
+const pages=[{id:'cover',label:'표지'},{id:'instructor',label:'강사 소개'},{id:'overview',label:'강의 소개'},{id:'journey',label:'이틀의 흐름'},{id:'ready',label:'시작 준비'}];
+const storageKey='ku-agent:intro-page-v1';
+const two=(n:number)=>String(n).padStart(2,'0');
+const progression=[{Icon:BookOpen,title:'이해',detail:'개념과 실행 과정을 연결하고'},{Icon:Code2,title:'구현',detail:'내 코드로 에이전트를 만들고'},{Icon:FlaskConical,title:'개선',detail:'실패 기록에서 다음 실험을 찾습니다'}];
+const objectives=[{Icon:MessageSquare,title:'구조를 설명하기',body:'LLM과 Agent의 차이, API 호출, Tool Calling과 실행 루프를 이해합니다.'},{Icon:Wrench,title:'기능을 연결하기',body:'도구·MCP·RAG·Memory가 맡는 역할을 구분하고 예제의 흐름을 읽습니다.'},{Icon:FlaskConical,title:'실행하며 개선하기',body:'프롬프트와 도구 사용을 바꾸고, 실행 기록과 평가 결과로 개선을 확인합니다.'}];
+function pageIndex(hash:string,saved:string|null=null){const id=hash.startsWith('#intro/')?hash.slice(7):saved;return Math.max(0,pages.findIndex(p=>p.id===id));}
+
+export default function CourseIntro({onStart,onSetup}:{onStart:()=>void;onSetup:()=>void}){
+ const [page,setPage]=useState(0),[restored,setRestored]=useState(false),[outline,setOutline]=useState(false),[fullscreen,setFullscreen]=useState(false);
+ const stage=useRef<HTMLElement>(null),current=pages[page];
+ useEffect(()=>{
+  let saved=null;try{saved=localStorage.getItem(storageKey);}catch{}
+  setPage(pageIndex(location.hash,saved));setRestored(true);
+  const change=()=>{if(location.hash.startsWith('#intro/'))setPage(pageIndex(location.hash));};
+  window.addEventListener('hashchange',change);return()=>window.removeEventListener('hashchange',change);
+ },[]);
+ useEffect(()=>{if(restored)try{localStorage.setItem(storageKey,current.id);}catch{}},[current.id,restored]);
+ useEffect(()=>{const change=()=>setFullscreen(document.fullscreenElement===stage.current);document.addEventListener('fullscreenchange',change);return()=>document.removeEventListener('fullscreenchange',change);},[]);
+ useEffect(()=>{if(!fullscreen)return;const old=document.body.style.overflow;document.body.style.overflow='hidden';return()=>{document.body.style.overflow=old;};},[fullscreen]);
+ function go(index:number){const next=Math.max(0,Math.min(pages.length-1,index));setPage(next);setOutline(false);location.hash='intro/'+pages[next].id;stage.current?.focus({preventScroll:true});if(!fullscreen)stage.current?.scrollIntoView({block:'start'});}
+ async function toggleFullscreen(){
+  if(fullscreen){setFullscreen(false);if(document.fullscreenElement)await document.exitFullscreen();return;}
+  setFullscreen(true);try{await stage.current?.requestFullscreen();}catch{/* Use the same viewport layout in embedded browsers. */}stage.current?.focus({preventScroll:true});
+ }
+ async function leave(action:()=>void){if(document.fullscreenElement===stage.current)await document.exitFullscreen();setFullscreen(false);action();}
+ function keyboard(e:React.KeyboardEvent){
+  if(e.key==='Escape'&&!document.fullscreenElement){setFullscreen(false);return;}
+  if(e.altKey||e.ctrlKey||e.metaKey||e.shiftKey||!(e.target instanceof HTMLElement)||e.target.closest('button,a,input,textarea,select,[contenteditable="true"]'))return;
+  if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();go(page+(e.key==='ArrowRight'?1:-1));}
+ }
+ return <section ref={stage} className={'web-lecture course-intro '+(fullscreen?'is-presenting':'')} tabIndex={0} onKeyDown={keyboard} aria-label="강의 소개 자료">
+  <header className="lesson-toolbar"><div className="lesson-location"><span>WELCOME</span><i>/</i><b>AI Agent Workshop</b></div><div className="lesson-toolbar-actions"><button className="lesson-tool" onClick={toggleFullscreen} aria-label={fullscreen?'전체 화면 닫기':'전체화면'}><Maximize2 size={15}/><span>{fullscreen?'전체 화면 닫기':'전체화면'}</span></button></div></header>
+  <div className="lesson-progress" aria-label={`${pages.length}장 중 ${page+1}번째`}><span style={{width:`${(page+1)/pages.length*100}%`}}/></div>
+  <div className="lesson-navigation"><button className={'lesson-outline-toggle '+(outline?'selected':'')} onClick={()=>setOutline(!outline)} aria-expanded={outline}><List size={16}/><b>목차</b><span>{two(page+1)} / {two(pages.length)}</span><ChevronDown size={13}/></button><div className="lesson-breadcrumb">강의 소개</div><div className="lesson-quick-nav"><button aria-label="이전 주제" disabled={page===0} onClick={()=>go(page-1)}><ChevronLeft size={18}/></button><button aria-label="다음 주제" disabled={page===pages.length-1} onClick={()=>go(page+1)}><ChevronRight size={18}/></button></div></div>
+  {outline&&<nav className="lesson-outline" aria-label="소개 목차">{pages.map((p,i)=><button key={p.id} className={page===i?'current':''} aria-current={page===i?'step':undefined} onClick={()=>go(i)}><span>{two(i+1)}</span><b>{p.label}</b></button>)}</nav>}
+  <article key={current.id} className={'lesson-page intro-page intro-'+current.id} data-intro-page={current.id}>
+   {page===0?<>
+    <div className="intro-cover-top"><span className="intro-label">GDGoC KOREA UNIVERSITY</span><span>CONCEPT → CODE → EXPERIMENT</span></div>
+    <div className="intro-cover-grid"><div className="intro-cover-copy"><p className="intro-cover-eyebrow">AI AGENT WORKSHOP</p><h1><span>AI Agent</span>이해에서<br/>구현까지.</h1><p className="intro-cover-description">모델에 도구와 기억을 더하고,<br/>직접 만든 에이전트를 실행하며 배웁니다.</p><button className="button primary" onClick={()=>go(1)}>강의 만나보기 <ArrowRight size={16}/></button></div>
+     <div className="intro-cover-visual" aria-label="이해, 구현, 개선으로 이어지는 학습 과정"><div className="intro-visual-caption"><Workflow size={18}/><span>BUILD YOUR FIRST AGENT</span></div>{progression.map(({Icon,title,detail},i)=><div className="intro-visual-step" key={title}><span className="intro-step-icon"><Icon size={22}/></span><div><small>{two(i+1)}</small><b>{title}</b><p>{detail}</p></div></div>)}<div className="intro-visual-bottom"><span>LLM</span><span>TOOLS</span><span>MEMORY</span><span>EVALUATION</span></div></div>
+    </div><div className="intro-cover-bottom"><span><b>Minjae Kim</b> · 고려대학교 컴퓨터학과</span><span>2일 · 설명과 시연, 그리고 개인 해커톤</span></div>
+   </>:<>
+    <div className="lesson-heading"><div className="lesson-kicker"><span>{two(page+1)}</span><i/>{current.label}</div><h1>{page===1?'함께 만들고, 실험할 사람.':page===2?'모델 호출에서,\n일을 수행하는 에이전트로.':page===3?'첫날은 구조를 이해하고,\n둘째 날은 직접 만듭니다.':'브라우저와 아이디어를 준비하세요.'}</h1><p>{page===1?'LLM Agent와 RAG를 연구합니다. 이번 강의에서는 개념을 코드와 실행 과정으로 연결합니다.':page===2?'작동 원리를 이해하고, 작은 에이전트를 개발·검증할 수 있는 출발점을 만듭니다.':page===3?'같은 개념을 설명, 실행, 개선의 과정으로 반복해서 만나봅니다.':'제공된 시작 코드에서 출발합니다. 필요한 부분을 바꾸며 첫 실험을 시작하세요.'}</p></div>
+    <div className="intro-content">
+     {page===1&&<div className="intro-instructor-grid"><aside className="intro-person"><img className="intro-portrait" src="/images/minjae-kim.png" alt="강사 Minjae Kim 프로필 사진" width={1042} height={1374}/><span className="intro-label">YOUR INSTRUCTOR</span><h2>Minjae Kim</h2><p>고려대학교 컴퓨터학과 23학번</p><div className="intro-research"><span>LLM Agent</span><span>RAG</span></div><a href="https://minjaek.im/" target="_blank" rel="noreferrer">minjaek.im <ExternalLink size={14}/></a></aside><div className="intro-bio"><section><GraduationCap size={20}/><div><span>EDUCATION</span><h3>고려대학교 컴퓨터학과</h3><p>23학번</p></div></section><section><GraduationCap size={20}/><div><span>GRADUATE STUDY</span><h3>KAIST MLAI Lab</h3><p>2027년 3월 석사과정 입학 예정</p></div></section><section><Code2 size={20}/><div><span>PROJECT</span><h3>SW중심대학 산학협력 프로젝트 팀장</h3><p>2025년 여름</p></div></section><section><Trophy size={20}/><div><span>AWARD</span><h3>2025 SW중심대학 우수작품 경진대회 최우수상</h3><p>정보통신기획평가원장상</p></div></section></div></div>}
+     {page===2&&<><div className="intro-objectives">{objectives.map(({Icon,title,body},i)=><section key={title}><div><Icon size={23}/><span>{two(i+1)}</span></div><h2>{title}</h2><p>{body}</p></section>)}</div><div className="intro-agent-flow" aria-label="에이전트 실행 흐름"><span>사용자 요청</span><ArrowRight size={16}/><strong>모델의 판단</strong><ArrowRight size={16}/><span>도구 실행</span><ArrowRight size={16}/><span>결과 관찰 · 다음 판단</span></div><p className="intro-footnote"><b>처음이어도 괜찮습니다.</b> Python 기본 문법을 알면 도움이 됩니다. 입문자는 시작 코드와 예제를, 경험자는 도구 설계와 실행 전략의 개선을 출발점으로 삼으세요.</p></>}
+     {page===3&&<><div className="intro-days"><section><div className="intro-day-label"><span>DAY 01</span><BookOpen size={22}/></div><h2>개념을 보고,<br/>실행으로 확인합니다.</h2><p>짧은 설명과 강사 시연을 번갈아 진행합니다.</p><ol><li><b>모델과 에이전트</b><span>LLM과 Agent · 로컬 모델과 API</span></li><li><b>도구로 행동하기</b><span>Tool Calling · Agent Loop · MCP</span></li><li><b>근거와 기억 더하기</b><span>RAG · 대화 맥락 · Agent Memory</span></li></ol><small>하나의 행사 비서가 기능을 갖춰가는 과정을 따라갑니다.</small></section><section><div className="intro-day-label"><span>DAY 02</span><Code2 size={22}/></div><h2>같은 문제에 도전하고,<br/>내 에이전트를 개선합니다.</h2><p>개인 해커톤으로 여행 예약 에이전트를 만듭니다.</p><ol><li><b>시작 코드 실행</b><span>BFCL 기반 여행 업무 · 가상 도구</span></li><li><b>코드 수정과 반복 평가</b><span>프롬프트 · 도구 사용 · 대화 상태</span></li><li><b>리더보드와 결과 공유</b><span>연습 6개 · 최종 20개 케이스</span></li></ol><small>모든 턴을 통과한 케이스 수로 비교합니다. 실제 예약·결제는 없습니다.</small></section></div><p className="intro-footnote"><b>별도 제출 과제는 없습니다.</b> 1일차 후에는 관심 있는 주제로 자유롭게 응용해볼 수 있습니다. 2일차에는 제공된 기본 코드부터 시작해도 됩니다.</p></>}
+     {page===4&&<><ol className="intro-checklist"><li><span>01</span><div><h2>노트북과 웹 브라우저</h2><p>이 사이트에서 강의와 시연을 보고, 코드를 수정하고 평가합니다. 웹 실습에는 별도 Python 설치나 GPU가 필요하지 않습니다.</p></div><Terminal size={25}/></li><li><span>02</span><div><h2>사용할 API 키 하나</h2><p>학교 API 또는 OpenAI API 중 하나를 선택합니다. 두 경로 모두 <code>{MODEL_PROVIDERS.school.model}</code>을 사용하며, 선택한 계정의 크레딧·사용료가 적용됩니다.</p></div><KeyRound size={25}/></li><li><span>03</span><div><h2>작게 바꾸고, 결과 확인하기</h2><p>기본 코드의 프롬프트나 도구 사용부터 바꿔보세요. AI 코딩 도구를 활용해도 좋습니다. 무엇을 바꿨고 왜 달라졌는지 실행 기록으로 확인합니다.</p></div><Check size={25}/></li></ol><div className="intro-ready-bottom"><p>소개와 예시 기록은 API 키 없이 볼 수 있어요.<br/>실제 모델 실행 전에 키를 입력하면 됩니다.</p><button className="button secondary" onClick={()=>leave(onSetup)}><KeyRound size={15}/>참가 · API 설정</button><button className="button primary" onClick={()=>leave(onStart)}>1일차 강의 시작하기 <ArrowRight size={15}/></button></div></>}
+    </div>
+   </>}
+  </article>
+  <footer className="lesson-footer"><button disabled={page===0} onClick={()=>go(page-1)}><ChevronLeft size={17}/><span><small>이전</small>{pages[Math.max(0,page-1)].label}</span></button><span className="lesson-key-hint">← → 페이지 이동 <i>·</i> {two(page+1)} / {two(pages.length)}</span>{page<pages.length-1?<button className="next-lesson" onClick={()=>go(page+1)}><span><small>다음</small>{pages[page+1].label}</span><ArrowRight size={18}/></button>:<button className="next-lesson" onClick={()=>leave(onStart)}><span><small>DAY 01</small>1일차 강의로</span><ArrowRight size={18}/></button>}</footer>
+ </section>;
+}

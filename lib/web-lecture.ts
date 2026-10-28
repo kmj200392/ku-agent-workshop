@@ -58,5 +58,6 @@ export function lessonIndex(hash:string, fallback:string|null=null) {
 }
 export function workshopView(hash:string) {
  const id=hash.replace(/^#/, '').split('/')[0];
- return ['materials','demos','lesson',''].includes(id)?'lesson':id;
+ if(!id)return 'intro';
+ return ['materials','demos','lesson'].includes(id)?'lesson':id;
 }

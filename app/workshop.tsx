@@ -1,11 +1,12 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
 import WebLecture, {type TraceEvent} from './web-lecture';
+import CourseIntro from './course-intro';
 import {workshopView} from '../lib/web-lecture';
 import {MODEL_PROVIDERS,modelConfig} from '../lib/model-providers.mjs';
 type Provider=keyof typeof MODEL_PROVIDERS;
-import {ArrowRight,BookOpen,Check,CheckCircle2,ChevronRight,Code2,Download,FileCode2,FlaskConical,KeyRound,LoaderCircle,Play,RefreshCw,Settings2,ShieldCheck,Square,Terminal,Trophy,Upload,X} from 'lucide-react';
-const nav=[['lesson','1일차 강의',BookOpen],['arena','워크스페이스',Code2],['leaderboard','리더보드',Trophy],['guide','과제 · 사용 가이드',BookOpen]] as const;
+import {ArrowRight,BookOpen,Check,CheckCircle2,ChevronRight,Code2,Download,FileCode2,FlaskConical,GraduationCap,KeyRound,LoaderCircle,Play,RefreshCw,Settings2,ShieldCheck,Square,Terminal,Trophy,Upload,X} from 'lucide-react';
+const nav=[['intro','강의 소개',GraduationCap],['lesson','1일차 강의',BookOpen],['arena','워크스페이스',Code2],['leaderboard','리더보드',Trophy],['guide','과제 · 사용 가이드',BookOpen]] as const;
 const storageKey=(k:string)=>'ku-agent:'+(['code','last-result','pending'].includes(k)?'bfcl-travel-v1:':'')+k;
 const storage={get:(k:string,fallback:any)=>{try{return JSON.parse(localStorage.getItem(storageKey(k))||'null')??fallback;}catch{return fallback;}},set:(k:string,v:any)=>{try{localStorage.setItem(storageKey(k),JSON.stringify(v));return true;}catch{return false;}}};
 async function api(path:string,data?:any):Promise<any>{const r=await fetch('/api/'+path,data===undefined?{cache:'no-store'}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});const d:any=await r.json();if(!r.ok)throw Error(d.error||'요청 실패');return d;}
@@ -14,7 +15,7 @@ function download(name:string,data:string,type='text/plain'){const url=URL.creat
 const statusText=(s:string)=>({completed:'평가 완료',error:'실행 오류 · 순위 미반영',aborted:'중단됨 · 순위 미반영',running:'실행 중',expired:'마감 후 완료 · 순위 미반영',pass:'통과',fail:'실패'}[s]||s);
 const fmt=(n:number)=>`${(n/1000).toFixed(1)}초`;
 export default function Workshop(){
- const [view,setView]=useState('lesson'),[config,setConfig]=useState<any>(null),[code,setCode]=useState(''),[nickname,setNickname]=useState(''),[me,setMe]=useState<any>(null),[settings,setSettings]=useState(false),[notice,setNotice]=useState(''),[ready,setReady]=useState(false);
+ const [view,setView]=useState('intro'),[config,setConfig]=useState<any>(null),[code,setCode]=useState(''),[nickname,setNickname]=useState(''),[me,setMe]=useState<any>(null),[settings,setSettings]=useState(false),[notice,setNotice]=useState(''),[ready,setReady]=useState(false);
  const [provider,setProvider]=useState<Provider>('school'),[apiKeys,setApiKeys]=useState({school:'',openai:''});
  const key=apiKeys[provider],connection=modelConfig(config,provider);
  const setKey=(value:string)=>setApiKeys(old=>({...old,[provider]:value}));
@@ -102,6 +103,7 @@ export default function Workshop(){
   </aside>
   <div className="main"><header className="topbar"><div><a className="crumb lecture-back" href="/">강의 목록</a><ChevronRight size={14}/><span className="workshop-crumb">AI Agent</span><ChevronRight size={14}/><b>{nav.find(n=>n[0]===view)?.[1]}</b></div><div className="top-actions"><span className="pill neutral"><span className="dot"/>{config?.phase==='final'?'최종 평가':config?.phase==='closed'?'행사 종료':'연습 평가 진행 중'}</span><button className="icon-button" aria-label="API 및 참가 설정" onClick={()=>setSettings(true)}><Settings2 size={18}/></button></div></header>
    <main className="content">{notice&&<div className="notice" role="status"><span>{notice}</span><button aria-label="알림 닫기" onClick={()=>setNotice('')}><X size={16}/></button></div>}
+   {view==='intro'&&<CourseIntro onStart={()=>{location.hash='lesson/start';setView('lesson');}} onSetup={()=>setSettings(true)}/>}
    {view==='arena'&&<>
     <div className="page-heading"><div><div className="eyebrow">DAY 02 · AGENT HACKATHON</div><h1>작은 코드, 더 나은 에이전트.</h1><p>같은 문제를 해결하고, 실행 결과로 비교해보세요.</p></div><button className="button secondary" onClick={()=>navigate('guide')}>과제 가이드 <ArrowRight size={15}/></button></div>
     <section className="mission-banner"><div><span className="light-label">THE CHALLENGE</span><h2>대화를 이어가며 일하는<br/>여행 예약 에이전트</h2><p>BFCL 원본 도구로 항공료 조회부터 예약·취소까지 처리하세요.</p><div className="banner-tags"><span>Tool Calling</span><span>Multi-turn</span><span>Context</span></div></div><div className="flow-visual"><div className="flow-node"><span>01</span>고객 요청<ChevronRight size={15}/></div><div className="flow-node emphasized"><span>02</span>나의 에이전트<Code2 size={19}/></div><div className="flow-node"><span>03</span>정확한 처리<CheckCircle2 size={17}/></div><small>BFCL · PRACTICE 6 / FINAL 20</small></div></section>

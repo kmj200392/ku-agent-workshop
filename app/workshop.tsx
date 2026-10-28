@@ -2,6 +2,7 @@
 import {useEffect,useRef,useState} from 'react';
 import WebLecture, {type TraceEvent} from './web-lecture';
 import CourseIntro from './course-intro';
+import ApiKeyFields from './api-key-fields';
 import {workshopView} from '../lib/web-lecture';
 import {MODEL_PROVIDERS,modelConfig} from '../lib/model-providers.mjs';
 type Provider=keyof typeof MODEL_PROVIDERS;
@@ -45,7 +46,7 @@ export default function Workshop(){
   const tick=async()=>{if(document.visibilityState!=='visible')return;try{const c=await api('config');setConfig(c);if(view==='leaderboard')await refreshBoard();if(pendingRef.current&&!busyRef.current)await upload(pendingRef.current);}catch{}};
   const t=setInterval(tick,30000);document.addEventListener('visibilitychange',tick);return()=>{clearInterval(t);document.removeEventListener('visibilitychange',tick);};
  },[view,boardKind]);
- useEffect(()=>{if(config?.phase==='final'&&me?.participant&&key&&!busy&&!demoBusy&&!settings&&!finalAttempt.current&&!pending){finalAttempt.current=true;start(true);}},[config?.phase,me?.participant,key,busy,demoBusy,settings,pending]);
+ useEffect(()=>{if(view!=='intro'&&config?.phase==='final'&&me?.participant&&key&&!busy&&!demoBusy&&!settings&&!finalAttempt.current&&!pending){finalAttempt.current=true;start(true);}},[view,config?.phase,me?.participant,key,busy,demoBusy,settings,pending]);
  function navigate(v:string){location.hash=v;setView(v);}
  async function upload(payload:any){try{const d=await api('finish',payload);setPending(null);storage.set('pending',null);setResult((old:any)=>{if(old?.runId===payload.runId){const next={...old,uploaded:true,...(d.late?{status:'expired'}:{})};storage.set('last-result',next);return next;}return old;});await refreshMe();return d;}catch(e:any){setNotice('결과는 브라우저에 보관했어요. 업로드 재시도: '+e.message);return null;}}
  async function start(final=false){
@@ -103,7 +104,7 @@ export default function Workshop(){
   </aside>
   <div className="main"><header className="topbar"><div><a className="crumb lecture-back" href="/">강의 목록</a><ChevronRight size={14}/><span className="workshop-crumb">AI Agent</span><ChevronRight size={14}/><b>{nav.find(n=>n[0]===view)?.[1]}</b></div><div className="top-actions"><span className="pill neutral"><span className="dot"/>{config?.phase==='final'?'최종 평가':config?.phase==='closed'?'행사 종료':'연습 평가 진행 중'}</span><button className="icon-button" aria-label="API 및 참가 설정" onClick={()=>setSettings(true)}><Settings2 size={18}/></button></div></header>
    <main className="content">{notice&&<div className="notice" role="status"><span>{notice}</span><button aria-label="알림 닫기" onClick={()=>setNotice('')}><X size={16}/></button></div>}
-   {view==='intro'&&<CourseIntro onStart={()=>{location.hash='lesson/start';setView('lesson');}} onSetup={()=>setSettings(true)}/>}
+   {view==='intro'&&<CourseIntro onStart={()=>{location.hash='lesson/start';setView('lesson');}} onSetup={()=>setSettings(true)} apiSettings={<><ApiKeyFields id="intro-api-key" provider={provider} apiKey={key} disabled={busy||demoBusy} onProviderChange={setProvider} onKeyChange={setKey}/><button className="text-button intro-key-clear" disabled={busy||demoBusy||!key} onClick={()=>setKey('')}>선택한 키 지우기</button></>}/>}
    {view==='arena'&&<>
     <div className="page-heading"><div><div className="eyebrow">DAY 02 · AGENT HACKATHON</div><h1>작은 코드, 더 나은 에이전트.</h1><p>같은 문제를 해결하고, 실행 결과로 비교해보세요.</p></div><button className="button secondary" onClick={()=>navigate('guide')}>과제 가이드 <ArrowRight size={15}/></button></div>
     <section className="mission-banner"><div><span className="light-label">THE CHALLENGE</span><h2>대화를 이어가며 일하는<br/>여행 예약 에이전트</h2><p>BFCL 원본 도구로 항공료 조회부터 예약·취소까지 처리하세요.</p><div className="banner-tags"><span>Tool Calling</span><span>Multi-turn</span><span>Context</span></div></div><div className="flow-visual"><div className="flow-node"><span>01</span>고객 요청<ChevronRight size={15}/></div><div className="flow-node emphasized"><span>02</span>나의 에이전트<Code2 size={19}/></div><div className="flow-node"><span>03</span>정확한 처리<CheckCircle2 size={17}/></div><small>BFCL · PRACTICE 6 / FINAL 20</small></div></section>
@@ -149,7 +150,6 @@ export default function Workshop(){
       <p className="field-hint">이 브라우저에서 30일간 접속을 유지합니다. 다른 기기에서는 개인 참가 코드로 접속하세요.</p><button className="text-button" disabled={busy||demoBusy||!!pending} onClick={signOut}>로그아웃</button>
     </>}{authError&&<p className="auth-error" role="alert">{authError}</p>}
 
-    <fieldset className="api-provider-field"><legend>사용할 API</legend><div className="segmented" aria-label="API 제공자">{(Object.keys(MODEL_PROVIDERS) as Provider[]).map(id=><button key={id} type="button" disabled={busy||demoBusy} aria-pressed={provider===id} className={provider===id?'selected':''} onClick={()=>setProvider(id)}>{MODEL_PROVIDERS[id].label}</button>)}</div><p className="field-hint">둘 중 하나의 키만 있으면 시연과 평가를 실행할 수 있어요.</p></fieldset>
-    <label htmlFor="api-key">{connection.label} 키 <KeyRound size={14}/></label><input id="api-key" type="password" autoComplete="off" value={key} onChange={e=>setKey(e.target.value.trim())} placeholder={provider==='openai'?'OpenAI API 키 입력':'학교 개인 API 키 입력'} disabled={busy||demoBusy}/><p className="field-hint">키는 이 페이지의 메모리에만 있으며 선택한 API 제공자에게만 전송됩니다. 서버나 브라우저 저장소에 보관하지 않으며, 새로고침하면 지워집니다.</p><label>사용 모델</label><div className="readonly-field">{connection.model}</div><p className="field-hint">{connection.label}를 브라우저에서 직접 호출합니다. {provider==='openai'?'OpenAI API 사용료가 본인 계정에 청구되며 ChatGPT 구독과 별도입니다.':'학교 개인 크레딧과 해당 모델의 사용 권한이 필요합니다.'}</p><div className="modal-bottom"><button className="text-button" disabled={busy||demoBusy} onClick={()=>setKey('')}>선택한 키 지우기</button><button className="button primary" onClick={()=>setSettings(false)}><Check size={15}/>설정 완료</button></div></section></div>}
+    <ApiKeyFields provider={provider} apiKey={key} disabled={busy||demoBusy} onProviderChange={setProvider} onKeyChange={setKey}/><div className="modal-bottom"><button className="text-button" disabled={busy||demoBusy} onClick={()=>setKey('')}>선택한 키 지우기</button><button className="button primary" onClick={()=>setSettings(false)}><Check size={15}/>설정 완료</button></div></section></div>}
  </div>;
 }

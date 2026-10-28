@@ -4,8 +4,8 @@ import {ArrowDown,ArrowRight,BookOpen,Check,ChevronDown,ChevronLeft,ChevronRight
 import {lessons,lessonIndex,lessonStorageKey,type Concept,type Lesson} from '../lib/web-lecture';
 
 export type TraceEvent={seq:number;kind:string;label:string;data:unknown};
-type Result={events:TraceEvent[]};
-type Props={demo:string;mode:string;result:Result|null;busy:boolean;runDisabled:boolean;status:string;
+type Result={events:TraceEvent[];model?:string};
+type Props={apiLabel?:string;demo:string;mode:string;result:Result|null;busy:boolean;runDisabled:boolean;status:string;
  onSelect:(id:string)=>void;onModeChange:(mode:string)=>void;onRun:()=>void;onStop:()=>void;onDownload:()=>void;onHackathon:()=>void};
 const two=(n:number)=>String(n).padStart(2,'0');
 const kindName:Record<string,string>={intro:'시작',model_input:'입력',model_output:'모델',answer:'답변',tool:'도구',tool_request:'요청',tool_result:'결과',direct_tool:'함수',stop:'종료',retrieval:'검색',notice:'안내',validation:'검증',mcp_request:'요청',mcp_response:'응답',tools:'도구 목록',memory_write:'기억 저장',memory_read:'기억 조회',memory_request:'저장 요청'};
@@ -57,10 +57,10 @@ function Execution({lesson,controls:p}:{lesson:Lesson;controls:Props}) {
  const active=events.find(e=>e.seq===expanded);
  const noApi=['D08','D10'].includes(example.demo);
  return <section className="lesson-execution" aria-label={`${lesson.short} 실행`}>
-  <div className="execution-heading"><span><span className={'execution-dot '+(p.busy?'running':'')}/>{p.busy?'실행 중':result?'실행 기록 있음':'직접 확인하기'}</span><small>{example.demo} · 행사 비서</small></div>
+  <div className="execution-heading"><span><span className={'execution-dot '+(p.busy?'running':'')}/>{p.busy?'실행 중':result?'실행 기록 있음':'직접 확인하기'}</span><small>{example.demo} · {result?.model||'행사 비서'}</small></div>
   <div className="lesson-question"><MessageSquare size={18}/><p>{example.question}</p></div>
   <div className="execution-actions"><div className="execution-modes" aria-label="실행 방식">{[['live','실제 실행'],['record','예시 기록']].map(([id,label])=><button key={id} disabled={p.busy} aria-pressed={p.mode===id} className={p.mode===id?'selected':''} onClick={()=>{setExpanded(null);p.onModeChange(id);}}>{label}</button>)}</div>{p.busy?<button className="button danger" onClick={p.onStop}><Square size={13}/>중단</button>:<button className="button primary" disabled={p.runDisabled||p.demo!==example.demo} onClick={()=>{setExpanded(null);p.onRun();}}>{p.mode==='record'?<BookOpen size={14}/>:result?<RotateCcw size={14}/>:<Play size={14}/>} {p.mode==='record'?'기록 불러오기':result?'다시 실행':'실행하기'}</button>}</div>
-  <p className="execution-disclosure">{p.mode==='record'?'규칙으로 미리 만든 모의 기록입니다. 실제 LLM 추론이나 새 코드 실행은 하지 않습니다.':noApi?'이 단계는 API 키 없이 브라우저에서 실제로 실행됩니다.':'내 브라우저가 도구를 실행하고, 학교 API가 모델 추론을 수행합니다. 개인 API 키와 크레딧이 필요합니다.'}{['D08','D09'].includes(example.demo)&&' MCP는 브라우저 MessageChannel을 쓰는 교육용 구현입니다.'}</p>
+  <p className="execution-disclosure">{p.mode==='record'?'규칙으로 미리 만든 모의 기록입니다. 실제 LLM 추론이나 새 코드 실행은 하지 않습니다.':noApi?'이 단계는 API 키 없이 브라우저에서 실제로 실행됩니다.':`내 브라우저가 도구를 실행하고, ${p.apiLabel||'선택한 API'}가 모델 추론을 수행합니다. 개인 API 키와 크레딧이 필요합니다.`}{['D08','D09'].includes(example.demo)&&' MCP는 브라우저 MessageChannel을 쓰는 교육용 구현입니다.'}</p>
   {p.status&&<div className="execution-status" role="status">{p.busy&&<LoaderCircle size={13} className="spin"/>}{p.status}</div>}
   {!events.length&&!p.busy?<div className="execution-empty"><div className="empty-orbit"><Terminal size={25}/><span/></div><b>이 질문이 처리되는 과정을 확인하세요</b><p>실행하면 모델 입력, 도구 호출, 결과가 이곳에 나타납니다.</p></div>:<div className="execution-output">
    <div className="execution-result-tabs"><button aria-pressed={!showTrace} onClick={()=>setOutputView('result')}>결과</button><button aria-pressed={showTrace} onClick={()=>setOutputView('trace')}>단계별 기록 <span>{events.length}</span></button><button className="text-button" onClick={p.onDownload} disabled={p.busy||!result} aria-label="실행 기록 다운로드"><Download size={14}/></button></div>

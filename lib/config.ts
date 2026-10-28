@@ -1,6 +1,7 @@
+import {MODEL_PROVIDERS} from './model-providers.mjs';
 export const CONFIG = {
-  title: 'KU Agent Lab', model: 'claude-haiku-5-5',
-  gateway: 'https://api.baze.co/v1/gateway/chat/completions/',
+  title: 'KU Agent Lab', model: MODEL_PROVIDERS.school.model,
+  gateway: MODEL_PROVIDERS.school.gateway, providers: MODEL_PROVIDERS,
   practiceVersion: 'bfcl-travel-practice-v1', finalVersion: 'bfcl-travel-final-v1',
   practiceCount: 6, finalCount: 20, benchmark: 'BFCL V4 Multi-turn · TravelAPI',
   freezeAt: '2026-10-29T20:35:00+09:00', closeAt: '2026-10-29T20:55:00+09:00',

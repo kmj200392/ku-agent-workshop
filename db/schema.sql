@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS runs (
   id TEXT PRIMARY KEY, owner TEXT NOT NULL REFERENCES participants(id), request_id TEXT NOT NULL,
   code TEXT NOT NULL, hash TEXT NOT NULL, kind TEXT NOT NULL, suite TEXT NOT NULL,
   status TEXT NOT NULL, created INTEGER NOT NULL, finished INTEGER, score INTEGER,
-  total INTEGER, model_calls INTEGER, tool_calls INTEGER, elapsed REAL, summary TEXT, source_id TEXT
+  total INTEGER, model_calls INTEGER, tool_calls INTEGER, elapsed REAL, summary TEXT, source_id TEXT,
+  provider TEXT NOT NULL DEFAULT 'school', model TEXT NOT NULL DEFAULT 'claude-haiku-5-5'
 );
 CREATE INDEX IF NOT EXISTS runs_owner_created ON runs(owner, created);
 CREATE INDEX IF NOT EXISTS runs_board ON runs(kind, suite, status, score);

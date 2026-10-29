@@ -96,7 +96,7 @@ export default function Workshop(){
  }
  const shownRecords=busy?records:result?.cases||[];const passed=shownRecords.filter((r:any)=>r.status==='pass').length;
  return <div className="shell">
-  <aside className="sidebar"><a className="brand" href="#arena" onClick={()=>navigate('arena')}><span className="brand-mark" aria-hidden="true">m.</span><span>KU Agent Lab<small>GDGoC KOREA UNIVERSITY</small></span></a>
+  <aside className="sidebar"><a className="brand" href="#arena" onClick={()=>navigate('arena')}><img className="brand-mark" src="/brand/circle_blue.svg" alt="" width={34} height={34}/><span>Lecture<small>KU AGENT LAB · GDGoC</small></span></a>
    <div className="course-tag"><span className="dot"/>2026. 10. 28 — 29<span className="tag">WORKSHOP</span></div>
    <div className="nav-caption">BUILD · TEST · LEARN</div><nav>{nav.map(([id,label,Icon])=><button key={id} className={view===id?'nav-item active':'nav-item'} onClick={()=>navigate(id)}><Icon size={18}/>{label}{view===id&&<ChevronRight size={15}/>}</button>)}</nav>
    <div className="sidebar-note"><div className="mini-icon"><FlaskConical size={19}/></div><b>내 브라우저가 실험실</b><p>에이전트 실행과 채점은<br/>이 기기에서 진행됩니다.</p><span><ShieldCheck size={13}/> API 키는 서버에 저장하지 않아요</span></div>

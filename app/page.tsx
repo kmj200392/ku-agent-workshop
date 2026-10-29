@@ -5,7 +5,7 @@ import {lectures} from '../lib/lectures';
 export default function LectureHome() {
   return <div className="lecture-home">
     <header className="lecture-header">
-      <Link href="/" className="lecture-brand"><span className="brand-mark" aria-hidden="true">m.</span><span>Lectures<small>MINJAE KIM</small></span></Link>
+      <Link href="/" className="lecture-brand"><img className="brand-mark" src="/brand/circle_blue.svg" alt="" width={34} height={34}/><span>Lecture<small>MINJAE KIM</small></span></Link>
       <a href="https://minjaek.im/" className="lecture-profile">강사 소개 <ArrowRight size={15}/></a>
     </header>
     <main className="lecture-main">

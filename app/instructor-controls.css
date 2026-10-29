@@ -1,0 +1,5 @@
+.instructor-controls{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:16px 20px;margin-bottom:22px;border:1px solid #b8cdef;border-radius:9px;background:#eef4ff}
+.instructor-controls b{display:flex;align-items:center;gap:7px;font-size:12px;color:#285a9d}.instructor-controls p{font-size:11px;margin-top:5px;color:#657c9c}
+.instructor-confirm-copy{margin:18px 0;font-size:12px;color:#61718b;line-height:1.9}.instructor-confirm-copy li{margin:7px 0}.instructor-confirm-copy:is(ul){padding-left:18px}
+.final-window-notice{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid #bdcfe9;background:#f2f6fd;border-radius:8px;padding:14px 18px;margin-bottom:20px;font-size:12px;color:#42648f}.final-window-notice p{margin-top:4px;font-size:11px}
+@media(max-width:680px){.instructor-controls,.final-window-notice{align-items:flex-start;flex-direction:column}.instructor-controls .button{align-self:flex-end}}

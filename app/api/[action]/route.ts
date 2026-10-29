@@ -1,6 +1,7 @@
 import { db } from '../../../lib/database';
 import { getParticipant, authRateLimit, registerParticipant, loginParticipant, logoutParticipant, nicknamePattern } from '../../../lib/participant-auth';
-import { CONFIG, phase } from '../../../lib/config';
+import { CONFIG } from '../../../lib/config';
+import {isInstructor,workshopSchedule,FINAL_WINDOW_MS} from '../../../lib/workshop-control';
 import { MODEL_PROVIDERS } from '../../../lib/model-providers.mjs';
 import { practiceSuite, finalSuite } from '../../../lib/suites';
 import { z } from 'zod';
@@ -22,9 +23,10 @@ async function body(req:Request,max=110*1024) {
 }
 async function handle(req:Request) {
  const action=new URL(req.url).pathname.split('/').at(-1); const user=await getParticipant();const now=Date.now();
+ const schedule=await workshopSchedule(now);
  if(req.method==='GET') {
-  if(action==='config')return json({...CONFIG,phase:phase(now),serverNow:now,signedIn:!!user});
-  if(action==='suite') {const final=new URL(req.url).searchParams.get('kind')==='final';if(final&&phase(now)==='practice')return json({error:'최종 평가는 코드 마감 후 공개됩니다.'},403);return json({version:final?CONFIG.finalVersion:CONFIG.practiceVersion,cases:final?finalSuite:practiceSuite});}
+  if(action==='config')return json({...CONFIG,...schedule,serverNow:now,signedIn:!!user,isInstructor:await isInstructor(user)});
+  if(action==='suite') {const final=new URL(req.url).searchParams.get('kind')==='final';if(final&&schedule.phase==='practice')return json({error:'최종 평가는 코드 마감 후 공개됩니다.'},403);return json({version:final?CONFIG.finalVersion:CONFIG.practiceVersion,cases:final?finalSuite:practiceSuite});}
   if(action==='leaderboard') {
    const kind=new URL(req.url).searchParams.get('kind')==='final'?'final':'practice';
    const rows=await db().prepare(`WITH ranked AS (SELECT r.id,r.owner,r.score,r.total,r.model_calls,r.tool_calls,r.elapsed,r.finished,r.hash,r.provider,r.model,ROW_NUMBER() OVER(PARTITION BY r.owner ORDER BY r.score DESC,r.finished ASC) AS position FROM runs r WHERE r.kind=? AND r.suite=? AND r.status='completed') SELECT r.id,p.nickname,r.score,r.total,r.model_calls,r.tool_calls,r.elapsed,r.finished,r.hash,r.provider,r.model FROM ranked r JOIN participants p ON p.id=r.owner WHERE r.position=1 ORDER BY r.score DESC,r.finished ASC LIMIT 200`).bind(kind,kind==='final'?CONFIG.finalVersion:CONFIG.practiceVersion).all();
@@ -56,6 +58,15 @@ async function handle(req:Request) {
  }
  if(action==='logout'){await body(req,512);await logoutParticipant();return json({signedIn:false});}
  if(!user)return json({error:'참가 코드로 먼저 접속해주세요.'},401);
+ if(action==='start-final-for-all'){
+  if(!await isInstructor(user))return json({error:'강사 계정만 전체 최종 평가를 시작할 수 있습니다.'},403);
+  z.object({confirm:z.literal(true)}).strict().parse(await body(req,512));
+  if(schedule.manualStart)return json({started:true,alreadyStarted:true,...schedule});
+  if(schedule.phase!=='practice')return json({error:'이미 예정된 최종 평가가 시작되었거나 종료되었습니다.'},409);
+  // First click wins; retries and concurrent clicks cannot move the cutoff or deadline.
+  await db().prepare('INSERT OR IGNORE INTO workshop_control(version,freeze_at,close_at,started_by) VALUES(?,?,?,?)').bind(CONFIG.finalVersion,now,now+FINAL_WINDOW_MS,user.userId).run();
+  return json({started:true,...await workshopSchedule()});
+ }
  if(action==='join') {
   const p=z.object({nickname:z.string().trim().min(2).max(24).regex(/^[\p{L}\p{N} _.-]+$/u)}).strict().parse(await body(req,1024));
   await db().prepare('UPDATE participants SET nickname=? WHERE id=?').bind(p.nickname,user.userId).run();
@@ -68,16 +79,17 @@ async function handle(req:Request) {
   const id=await hash(`${user.userId}:${p.requestId}`), codeHash=await hash(p.code), model=MODEL_PROVIDERS[p.provider].model;
   const previous=await db().prepare('SELECT id,hash,status,suite,provider,model FROM runs WHERE id=? AND owner=?').bind(id,user.userId).first<any>();
   if(previous) return previous.hash===codeHash&&previous.suite===CONFIG.practiceVersion&&previous.provider===p.provider&&previous.model===model?json({runId:id,hash:codeHash,suite:previous.suite,status:previous.status,provider:previous.provider,model:previous.model}):json({error:'이미 사용한 제출 ID입니다.'},409);
-  if(phase(now)!=='practice')return json({error:'코드 제출이 마감되었습니다. 마감 전 평가가 완료된 마지막 코드를 사용합니다.'},409);
+  if(schedule.phase!=='practice')return json({error:'코드 제출이 마감되었습니다. 마감 전 평가가 완료된 마지막 코드를 사용합니다.'},409);
   const count=await db().prepare('SELECT COUNT(*) AS n FROM runs WHERE owner=?').bind(user.userId).first<any>();
   if(count.n>=60)return json({error:'수업 전체 제출 한도(60회)에 도달했습니다.'},429);
   const recent=await db().prepare('SELECT created FROM runs WHERE owner=? ORDER BY created DESC LIMIT 1').bind(user.userId).first<any>();
   if(recent&&now-recent.created<5000)return json({error:'5초 후 다시 제출해주세요.'},429);
-  await db().prepare('INSERT INTO runs(id,owner,request_id,code,hash,kind,suite,status,created,provider,model) VALUES(?,?,?,?,?,?,?,?,?,?,?)').bind(id,user.userId,p.requestId,p.code,codeHash,'practice',CONFIG.practiceVersion,'running',now,p.provider,model).run();
+  const inserted=await db().prepare('INSERT INTO runs(id,owner,request_id,code,hash,kind,suite,status,created,provider,model) SELECT ?,?,?,?,?,?,?,?,?,?,? WHERE NOT EXISTS (SELECT 1 FROM workshop_control WHERE version=?)').bind(id,user.userId,p.requestId,p.code,codeHash,'practice',CONFIG.practiceVersion,'running',now,p.provider,model,CONFIG.finalVersion).run();
+  if(!inserted.rowsAffected)return json({error:'강사가 최종 평가를 시작해 코드 제출이 마감되었습니다.'},409);
   return json({runId:id,hash:codeHash,suite:CONFIG.practiceVersion,status:'running',provider:p.provider,model});
  }
  if(action==='final-start') {
-  await body(req,512);if(phase(now)!=='final')return json({error:'최종 평가 시간이 아닙니다.'},409);
+  await body(req,512);if(schedule.phase!=='final')return json({error:'최종 평가 시간이 아닙니다.'},409);
   const id='final-'+(await hash(user.userId+':'+CONFIG.finalVersion)).slice(0,40);
   const existing=await db().prepare('SELECT id,code,hash,status,provider,model FROM runs WHERE id=? AND owner=?').bind(id,user.userId).first<any>();
   if(existing) {
@@ -87,7 +99,7 @@ async function handle(req:Request) {
    if(latest?.status==='completed')return json({runId:id,status:'completed'});
    return json({runId:id,code:existing.code,hash:existing.hash,suite:CONFIG.finalVersion,status:'running',provider:existing.provider,model:existing.model});
   }
-  const source=await db().prepare(FINAL_CANDIDATE_SQL).bind(user.userId,Date.parse(CONFIG.freezeAt),CONFIG.practiceVersion).first<any>();
+  const source=await db().prepare(FINAL_CANDIDATE_SQL).bind(user.userId,Date.parse(schedule.freezeAt),CONFIG.practiceVersion).first<any>();
   if(!source)return json({error:'마감 전에 평가까지 완료된 제출이 없습니다.'},409);
   await db().prepare('INSERT OR IGNORE INTO runs(id,owner,request_id,code,hash,kind,suite,status,created,source_id,provider,model) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)').bind(id,user.userId,id,source.code,source.hash,'final',CONFIG.finalVersion,'running',now,source.id,source.provider,source.model).run();
   return json({runId:id,code:source.code,hash:source.hash,suite:CONFIG.finalVersion,status:'running',provider:source.provider,model:source.model});
@@ -97,7 +109,7 @@ async function handle(req:Request) {
   const run=await db().prepare('SELECT * FROM runs WHERE id=? AND owner=?').bind(p.runId,user.userId).first<any>();if(!run)return json({error:'제출을 찾을 수 없습니다.'},404);
   if(![CONFIG.practiceVersion,CONFIG.finalVersion].includes(run.suite))return json({error:'이전 평가 버전의 제출입니다.'},409);
   if(run.status==='completed')return json({saved:true,alreadySaved:true,score:run.score});
-  if((run.kind==='final'&&phase(now)!=='final')||(run.kind==='practice'&&phase(now)!=='practice')) {
+  if((run.kind==='final'&&schedule.phase!=='final')||(run.kind==='practice'&&schedule.phase!=='practice')) {
    await db().prepare("UPDATE runs SET status='expired',finished=? WHERE id=? AND owner=? AND status!='completed'").bind(now,p.runId,user.userId).run();
    return json({saved:true,late:true,score:null});
   }
@@ -106,7 +118,13 @@ async function handle(req:Request) {
   if(p.status==='completed'&&(p.cases.length!==ids.length||p.cases.some(c=>c.status==='error')))return json({error:'완료된 평가에는 모든 항목의 정상 결과가 필요합니다.'},400);
   const score=p.cases.filter(c=>c.status==='pass').length;
   // Format/counter consistency only. This endpoint never executes code or regrades answers.
-  await db().prepare("UPDATE runs SET status=?,finished=?,score=?,total=?,model_calls=?,tool_calls=?,elapsed=?,summary=? WHERE id=? AND owner=? AND status!='completed'").bind(p.status,now,p.status==='completed'?score:null,ids.length,p.cases.reduce((n,c)=>n+c.modelCalls,0),p.cases.reduce((n,c)=>n+c.toolCalls,0),p.elapsed,JSON.stringify(p.cases),p.runId,user.userId).run();
+  const saved=await db().prepare("UPDATE runs SET status=?,finished=?,score=?,total=?,model_calls=?,tool_calls=?,elapsed=?,summary=? WHERE id=? AND owner=? AND status!='completed' AND (kind!='practice' OR NOT EXISTS (SELECT 1 FROM workshop_control WHERE version=?))").bind(p.status,now,p.status==='completed'?score:null,ids.length,p.cases.reduce((n,c)=>n+c.modelCalls,0),p.cases.reduce((n,c)=>n+c.toolCalls,0),p.elapsed,JSON.stringify(p.cases),p.runId,user.userId,CONFIG.finalVersion).run();
+  if(!saved.rowsAffected){
+   const latest=await db().prepare('SELECT status,score FROM runs WHERE id=? AND owner=?').bind(p.runId,user.userId).first<any>();
+   if(latest?.status==='completed')return json({saved:true,alreadySaved:true,score:latest.score});
+   await db().prepare("UPDATE runs SET status='expired',finished=? WHERE id=? AND owner=? AND status!='completed'").bind(now,p.runId,user.userId).run();
+   return json({saved:true,late:true,score:null});
+  }
   return json({saved:true,score:p.status==='completed'?score:null});
  }
  return json({error:'없는 경로입니다.'},404);

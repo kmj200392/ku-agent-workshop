@@ -8,4 +8,4 @@ export const CONFIG = {
   freezeAt: '2026-10-29T20:35:00+09:00', closeAt: '2026-10-29T20:55:00+09:00',
   limits: { codeBytes: 100*1024, resultBytes: 32*1024, modelCalls: 8, toolCalls: 16, caseModelCalls: 40, caseToolCalls: 80, caseMs: 180000, outputTokens: 2048 },
 };
-export function phase(now=Date.now()) { return now < Date.parse(CONFIG.freezeAt) ? 'practice' : now < Date.parse(CONFIG.closeAt) ? 'final' : 'closed'; }
+export function phase(now=Date.now(),schedule:{freezeAt:string;closeAt:string}=CONFIG) { return now < Date.parse(schedule.freezeAt) ? 'practice' : now < Date.parse(schedule.closeAt) ? 'final' : 'closed'; }

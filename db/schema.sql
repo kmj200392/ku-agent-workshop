@@ -18,3 +18,7 @@ CREATE TABLE IF NOT EXISTS runs (
 );
 CREATE INDEX IF NOT EXISTS runs_owner_created ON runs(owner, created);
 CREATE INDEX IF NOT EXISTS runs_board ON runs(kind, suite, status, score);
+CREATE TABLE IF NOT EXISTS workshop_control (
+  version TEXT PRIMARY KEY, freeze_at INTEGER NOT NULL, close_at INTEGER NOT NULL,
+  started_by TEXT NOT NULL REFERENCES participants(id)
+);

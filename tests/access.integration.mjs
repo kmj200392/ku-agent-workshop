@@ -38,7 +38,8 @@ try {
   const payload={runId:run.data.runId,status:'completed',elapsed:60,cases:suite.cases.map(c=>({id:c.id,status:'pass',elapsed:10,modelCalls:0,toolCalls:1}))};
   const b=await request('register',{nickname:'검증 참가자 B'});
   assert.equal((await request('finish',payload,b.cookie)).status,404);
-  assert.equal((await request('finish',payload,a.cookie)).data.score,6);
+  assert.equal((await request('finish',{...payload,cases:payload.cases.slice(0,3)},a.cookie)).status,400);
+  assert.equal((await request('finish',payload,a.cookie)).data.score,suite.cases.length);
   assert.equal((await request('finish',payload,a.cookie)).data.alreadySaved,true);
   const row=(await request('leaderboard')).data.entries[0];
   assert.equal(row.nickname,'검증 참가자 A');assert.equal(row.provider,'openai');assert.equal(row.model,'gpt-6-luna');
@@ -67,7 +68,7 @@ try {
   assert.equal(retried.data.provider,'openai');assert.equal(retried.data.model,'gpt-6-luna');assert.equal(retried.data.runId,frozen.data.runId);
   const finalSuite=(await request('suite?kind=final')).data;
   const finalPayload={runId:frozen.data.runId,status:'completed',elapsed:200,cases:finalSuite.cases.map(c=>({id:c.id,status:'pass',elapsed:10,modelCalls:1,toolCalls:1}))};
-  assert.equal((await request('finish',finalPayload,recovered.cookie)).data.score,20);
+  assert.equal((await request('finish',finalPayload,recovered.cookie)).data.score,finalSuite.cases.length);
   assert.equal((await request('final-start',{},recovered.cookie)).data.status,'completed');
   assert.equal((await request('leaderboard?kind=final')).data.entries[0].model,'gpt-6-luna');
   console.log('PASS: access control, provider validation, submission idempotency, model on leaderboard, frozen provider/model and final retry/completion.');

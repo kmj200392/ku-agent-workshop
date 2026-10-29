@@ -59,6 +59,15 @@
           "compute_exchange_rate(base_currency='GBP', target_currency='USD', value=15400.0)",
           "set_budget_limit(access_token='abc123token', budget_limit=22000.0)"
         ]
+      ],
+      "provenance": {
+        "kind": "bfcl",
+        "sourceId": "multi_turn_base_150",
+        "upstreamCommit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8",
+        "changes": []
+      },
+      "skills": [
+        "base"
       ]
     },
     {
@@ -127,6 +136,15 @@
           "compute_exchange_rate(base_currency='GBP', target_currency='USD', value=15400.0)",
           "set_budget_limit(access_token='abc123token', budget_limit=22000.0)"
         ]
+      ],
+      "provenance": {
+        "kind": "bfcl",
+        "sourceId": "multi_turn_miss_param_150",
+        "upstreamCommit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8",
+        "changes": []
+      },
+      "skills": [
+        "miss_param"
       ]
     },
     {
@@ -195,6 +213,15 @@
           "compute_exchange_rate(base_currency='GBP', target_currency='USD', value=15400.0)",
           "set_budget_limit(access_token='abc123token', budget_limit=22000.0)"
         ]
+      ],
+      "provenance": {
+        "kind": "bfcl",
+        "sourceId": "multi_turn_miss_func_150",
+        "upstreamCommit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8",
+        "changes": []
+      },
+      "skills": [
+        "miss_func"
       ]
     },
     {
@@ -257,6 +284,15 @@
         [
           "purchase_insurance(access_token='abc123xyz', insurance_type='comprehensive', insurance_cost=120.0, booking_id='3426812', card_id='id15583')"
         ]
+      ],
+      "provenance": {
+        "kind": "bfcl",
+        "sourceId": "multi_turn_base_155",
+        "upstreamCommit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8",
+        "changes": []
+      },
+      "skills": [
+        "base"
       ]
     },
     {
@@ -319,6 +355,15 @@
         [
           "purchase_insurance(access_token='abc123xyz', insurance_type='comprehensive', insurance_cost=120.0, booking_id='3426812', card_id='id15583')"
         ]
+      ],
+      "provenance": {
+        "kind": "bfcl",
+        "sourceId": "multi_turn_long_context_155",
+        "upstreamCommit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8",
+        "changes": []
+      },
+      "skills": [
+        "long_context"
       ]
     },
     {
@@ -388,7 +433,554 @@
         [
           "purchase_insurance(access_token='abc123xyz', insurance_type='comprehensive', insurance_cost=120.0, booking_id='3426812', card_id='id15583')"
         ]
+      ],
+      "provenance": {
+        "kind": "bfcl",
+        "sourceId": "multi_turn_miss_param_155",
+        "upstreamCommit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8",
+        "changes": []
+      },
+      "skills": [
+        "miss_param"
       ]
+    },
+    {
+      "id": "multi_turn_base_1100",
+      "family": "1100",
+      "title": "새 인증과 카드 등록 결과 재사용",
+      "label": "P07",
+      "category": "base",
+      "skills": [
+        "base",
+        "multi_turn"
+      ],
+      "entry": {
+        "id": "multi_turn_base_1100",
+        "question": [
+          [
+            {
+              "role": "user",
+              "content": "Authenticate as Mina Park using client_id workshop-app, client_secret simulated-secret, refresh_token simulated-refresh, grant_type read_write. These are simulated credentials."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Register my simulated card: number 4111111111111111, expiration 10/2031, cardholder Mina Park, verification number 321. Use the token just obtained."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Check the balance of the card you just registered."
+            }
+          ]
+        ],
+        "initial_config": {
+          "TravelAPI": {
+            "random_seed": 571100,
+            "credit_card_list": {
+              "card-1100": {
+                "balance": 50000.0
+              }
+            },
+            "booking_record": {},
+            "access_token": "workshop-token-1100",
+            "token_expires_in": 100,
+            "token_type": "Bearer",
+            "token_scope": "read_write",
+            "budget_limit": null,
+            "user_first_name": "Mina",
+            "user_last_name": "Park"
+          }
+        },
+        "involved_classes": [
+          "TravelAPI"
+        ],
+        "path": []
+      },
+      "ground_truth": [
+        [
+          "authenticate_travel(client_id='workshop-app', client_secret='simulated-secret', refresh_token='simulated-refresh', grant_type='read_write', user_first_name='Mina', user_last_name='Park')"
+        ],
+        [
+          "register_credit_card(access_token='850813', card_number='4111111111111111', expiration_date='10/2031', cardholder_name='Mina Park', card_verification_number=321)"
+        ],
+        [
+          "get_credit_card_balance(access_token='850813', card_id='110882734085')"
+        ]
+      ],
+      "provenance": {
+        "kind": "authored",
+        "version": "workshop-v2",
+        "notes": "New teaching scenario using unchanged BFCL TravelAPI and checker; not an official BFCL question."
+      }
+    },
+    {
+      "id": "multi_turn_base_1101",
+      "family": "1101",
+      "title": "빠진 날짜를 확인한 뒤 예약하기",
+      "label": "P08",
+      "category": "miss_param",
+      "skills": [
+        "miss_param",
+        "multi_turn"
+      ],
+      "entry": {
+        "id": "multi_turn_base_1101",
+        "question": [
+          [
+            {
+              "role": "user",
+              "content": "Please quote an economy flight from ORD to BOS. I have not chosen a date. Ask for it before using any tools."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "The date is 2027-02-18."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Book that exact trip. Use access token workshop-token-1101 and card ID card-1101."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Retrieve its invoice."
+            }
+          ]
+        ],
+        "initial_config": {
+          "TravelAPI": {
+            "random_seed": 571101,
+            "credit_card_list": {
+              "card-1101": {
+                "balance": 50000.0
+              }
+            },
+            "booking_record": {},
+            "access_token": "workshop-token-1101",
+            "token_expires_in": 100,
+            "token_type": "Bearer",
+            "token_scope": "read_write",
+            "budget_limit": null,
+            "user_first_name": "Mina",
+            "user_last_name": "Park"
+          }
+        },
+        "involved_classes": [
+          "TravelAPI"
+        ],
+        "path": []
+      },
+      "ground_truth": [
+        [],
+        [
+          "get_flight_cost(travel_from='ORD', travel_to='BOS', travel_date='2027-02-18', travel_class='economy')"
+        ],
+        [
+          "book_flight(access_token='workshop-token-1101', card_id='card-1101', travel_from='ORD', travel_to='BOS', travel_date='2027-02-18', travel_class='economy')"
+        ],
+        [
+          "retrieve_invoice(access_token='workshop-token-1101', booking_id='9480634')"
+        ]
+      ],
+      "provenance": {
+        "kind": "authored",
+        "version": "workshop-v2",
+        "notes": "New teaching scenario using unchanged BFCL TravelAPI and checker; not an official BFCL question."
+      }
+    },
+    {
+      "id": "multi_turn_base_1102",
+      "family": "1102",
+      "title": "예산 도구 복구까지 복합 요청 보류",
+      "label": "P09",
+      "category": "miss_func",
+      "skills": [
+        "miss_func",
+        "multi_turn"
+      ],
+      "entry": {
+        "id": "multi_turn_base_1102",
+        "question": [
+          [
+            {
+              "role": "user",
+              "content": "Convert 750 EUR to USD and set my account budget to the converted amount. If either operation is unavailable, do neither until the tool returns. Use access token workshop-token-1102 and card ID card-1102."
+            }
+          ],
+          [],
+          [
+            {
+              "role": "user",
+              "content": "Now change the budget to exactly 800 USD using the same token."
+            }
+          ]
+        ],
+        "initial_config": {
+          "TravelAPI": {
+            "random_seed": 571102,
+            "credit_card_list": {
+              "card-1102": {
+                "balance": 50000.0
+              }
+            },
+            "booking_record": {},
+            "access_token": "workshop-token-1102",
+            "token_expires_in": 100,
+            "token_type": "Bearer",
+            "token_scope": "read_write",
+            "budget_limit": null,
+            "user_first_name": "Mina",
+            "user_last_name": "Park"
+          }
+        },
+        "involved_classes": [
+          "TravelAPI"
+        ],
+        "path": [],
+        "missed_function": {
+          "1": [
+            "set_budget_limit"
+          ]
+        }
+      },
+      "ground_truth": [
+        [],
+        [
+          "compute_exchange_rate(base_currency='EUR', target_currency='USD', value=750)",
+          "set_budget_limit(access_token='workshop-token-1102', budget_limit=937.5)"
+        ],
+        [
+          "set_budget_limit(access_token='workshop-token-1102', budget_limit=800)"
+        ]
+      ],
+      "provenance": {
+        "kind": "authored",
+        "version": "workshop-v2",
+        "notes": "New teaching scenario using unchanged BFCL TravelAPI and checker; not an official BFCL question."
+      }
+    },
+    {
+      "id": "multi_turn_base_1103",
+      "family": "1103",
+      "title": "서로 다른 두 예약의 지시 대상 구분",
+      "label": "P10",
+      "category": "memory",
+      "skills": [
+        "memory",
+        "multi_turn"
+      ],
+      "entry": {
+        "id": "multi_turn_base_1103",
+        "question": [
+          [
+            {
+              "role": "user",
+              "content": "Book economy SFO to BOS for 2027-03-02. Use access token workshop-token-1103 and card ID card-1103."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Make a separate business reservation SFO to ORD for 2027-03-04, same token and card."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Get the invoice for the Boston booking, not Chicago."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Cancel only Chicago. Keep Boston."
+            }
+          ]
+        ],
+        "initial_config": {
+          "TravelAPI": {
+            "random_seed": 571103,
+            "credit_card_list": {
+              "card-1103": {
+                "balance": 50000.0
+              }
+            },
+            "booking_record": {},
+            "access_token": "workshop-token-1103",
+            "token_expires_in": 100,
+            "token_type": "Bearer",
+            "token_scope": "read_write",
+            "budget_limit": null,
+            "user_first_name": "Mina",
+            "user_last_name": "Park"
+          }
+        },
+        "involved_classes": [
+          "TravelAPI"
+        ],
+        "path": []
+      },
+      "ground_truth": [
+        [
+          "book_flight(access_token='workshop-token-1103', card_id='card-1103', travel_from='SFO', travel_to='BOS', travel_date='2027-03-02', travel_class='economy')"
+        ],
+        [
+          "book_flight(access_token='workshop-token-1103', card_id='card-1103', travel_from='SFO', travel_to='ORD', travel_date='2027-03-04', travel_class='business')"
+        ],
+        [
+          "retrieve_invoice(access_token='workshop-token-1103', booking_id='6254860')"
+        ],
+        [
+          "cancel_booking(access_token='workshop-token-1103', booking_id='6134940')"
+        ]
+      ],
+      "provenance": {
+        "kind": "authored",
+        "version": "workshop-v2",
+        "notes": "New teaching scenario using unchanged BFCL TravelAPI and checker; not an official BFCL question."
+      }
+    },
+    {
+      "id": "multi_turn_base_1104",
+      "family": "1104",
+      "title": "운임 조건에 따라 예약 보류와 재개",
+      "label": "P11",
+      "category": "conditional",
+      "skills": [
+        "conditional",
+        "multi_turn"
+      ],
+      "entry": {
+        "id": "multi_turn_base_1104",
+        "question": [
+          [
+            {
+              "role": "user",
+              "content": "Check the first-class fare SFO to JFK on 2027-04-11. Book only if the fare is at most $40. Do not change my account budget. Use access token workshop-token-1104 and card ID card-1104."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "I now approve up to $7000. Book that exact trip if it fits. Keep the account budget unchanged."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Get its invoice."
+            }
+          ]
+        ],
+        "initial_config": {
+          "TravelAPI": {
+            "random_seed": 571104,
+            "credit_card_list": {
+              "card-1104": {
+                "balance": 50000.0
+              }
+            },
+            "booking_record": {},
+            "access_token": "workshop-token-1104",
+            "token_expires_in": 100,
+            "token_type": "Bearer",
+            "token_scope": "read_write",
+            "budget_limit": null,
+            "user_first_name": "Mina",
+            "user_last_name": "Park"
+          }
+        },
+        "involved_classes": [
+          "TravelAPI"
+        ],
+        "path": []
+      },
+      "ground_truth": [
+        [
+          "get_flight_cost(travel_from='SFO', travel_to='JFK', travel_date='2027-04-11', travel_class='first')"
+        ],
+        [
+          "book_flight(access_token='workshop-token-1104', card_id='card-1104', travel_from='SFO', travel_to='JFK', travel_date='2027-04-11', travel_class='first')"
+        ],
+        [
+          "retrieve_invoice(access_token='workshop-token-1104', booking_id='7728912')"
+        ]
+      ],
+      "provenance": {
+        "kind": "authored",
+        "version": "workshop-v2",
+        "notes": "New teaching scenario using unchanged BFCL TravelAPI and checker; not an official BFCL question."
+      }
+    },
+    {
+      "id": "multi_turn_long_context_1105",
+      "family": "1105",
+      "title": "많은 예약 기록에서 조건에 맞는 항목 찾기",
+      "label": "P12",
+      "category": "long_context",
+      "skills": [
+        "long_context",
+        "multi_turn"
+      ],
+      "entry": {
+        "id": "multi_turn_long_context_1105",
+        "question": [
+          [
+            {
+              "role": "user",
+              "content": "List my booking history. Use access token workshop-token-1105 and card ID card-1105."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Get the invoice for my SFO to BOS business trip on 2027-08-08."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Cancel only that trip."
+            }
+          ]
+        ],
+        "initial_config": {
+          "TravelAPI": {
+            "random_seed": 571105,
+            "credit_card_list": {
+              "card-1105": {
+                "balance": 50000.0
+              }
+            },
+            "booking_record": {
+              "reservation-1105-0": {
+                "transaction_id": "txn-1105-0",
+                "travel_date": "2027-08-01",
+                "travel_from": "SFO",
+                "travel_to": "LAX",
+                "travel_class": "economy",
+                "travel_cost": 300.0,
+                "card_id": "card-1105"
+              },
+              "reservation-1105-1": {
+                "transaction_id": "txn-1105-1",
+                "travel_date": "2027-08-02",
+                "travel_from": "SFO",
+                "travel_to": "BOS",
+                "travel_class": "economy",
+                "travel_cost": 320.0,
+                "card_id": "card-1105"
+              },
+              "reservation-1105-2": {
+                "transaction_id": "txn-1105-2",
+                "travel_date": "2027-08-03",
+                "travel_from": "SFO",
+                "travel_to": "LAX",
+                "travel_class": "economy",
+                "travel_cost": 340.0,
+                "card_id": "card-1105"
+              },
+              "reservation-1105-3": {
+                "transaction_id": "txn-1105-3",
+                "travel_date": "2027-08-04",
+                "travel_from": "SFO",
+                "travel_to": "BOS",
+                "travel_class": "economy",
+                "travel_cost": 360.0,
+                "card_id": "card-1105"
+              },
+              "reservation-1105-4": {
+                "transaction_id": "txn-1105-4",
+                "travel_date": "2027-08-05",
+                "travel_from": "SFO",
+                "travel_to": "LAX",
+                "travel_class": "economy",
+                "travel_cost": 380.0,
+                "card_id": "card-1105"
+              },
+              "reservation-1105-5": {
+                "transaction_id": "txn-1105-5",
+                "travel_date": "2027-08-06",
+                "travel_from": "SFO",
+                "travel_to": "BOS",
+                "travel_class": "business",
+                "travel_cost": 400.0,
+                "card_id": "card-1105"
+              },
+              "reservation-1105-6": {
+                "transaction_id": "txn-1105-6",
+                "travel_date": "2027-08-07",
+                "travel_from": "SFO",
+                "travel_to": "LAX",
+                "travel_class": "business",
+                "travel_cost": 420.0,
+                "card_id": "card-1105"
+              },
+              "reservation-1105-7": {
+                "transaction_id": "txn-1105-7",
+                "travel_date": "2027-08-08",
+                "travel_from": "SFO",
+                "travel_to": "BOS",
+                "travel_class": "business",
+                "travel_cost": 440.0,
+                "card_id": "card-1105"
+              },
+              "reservation-1105-8": {
+                "transaction_id": "txn-1105-8",
+                "travel_date": "2027-08-09",
+                "travel_from": "SFO",
+                "travel_to": "LAX",
+                "travel_class": "business",
+                "travel_cost": 460.0,
+                "card_id": "card-1105"
+              },
+              "reservation-1105-9": {
+                "transaction_id": "txn-1105-9",
+                "travel_date": "2027-08-10",
+                "travel_from": "SFO",
+                "travel_to": "BOS",
+                "travel_class": "business",
+                "travel_cost": 480.0,
+                "card_id": "card-1105"
+              }
+            },
+            "access_token": "workshop-token-1105",
+            "token_expires_in": 100,
+            "token_type": "Bearer",
+            "token_scope": "read_write",
+            "budget_limit": null,
+            "user_first_name": "Mina",
+            "user_last_name": "Park"
+          }
+        },
+        "involved_classes": [
+          "TravelAPI"
+        ],
+        "path": []
+      },
+      "ground_truth": [
+        [
+          "get_booking_history(access_token='workshop-token-1105')"
+        ],
+        [
+          "retrieve_invoice(access_token='workshop-token-1105', booking_id='reservation-1105-7')"
+        ],
+        [
+          "cancel_booking(access_token='workshop-token-1105', booking_id='reservation-1105-7')"
+        ]
+      ],
+      "provenance": {
+        "kind": "authored",
+        "version": "workshop-v2",
+        "notes": "New teaching scenario using unchanged BFCL TravelAPI and checker; not an official BFCL question."
+      }
     }
   ],
   "final": [
@@ -404,7 +996,7 @@
           [
             {
               "role": "user",
-              "content": "I'm embarking on an adventure to spend some time with my family. Could you confirm my travel details for me? Just a quick rundown: my name is Theodore Collins, born on September 14, 1985; I have a U.S. passport starting with 'US876543'."
+              "content": "I'm embarking on an adventure to spend some time with my family. Could you confirm my travel details for me? Just a quick rundown: my name is Theodore Collins, born on September 14, 1985; I have a U.S. passport number is 'US876543'."
             }
           ],
           [
@@ -462,6 +1054,20 @@
         [
           "cancel_booking(access_token='abc123xyz', booking_id='3426812')"
         ]
+      ],
+      "provenance": {
+        "kind": "adapted_bfcl",
+        "sourceId": "multi_turn_base_158",
+        "upstreamCommit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8",
+        "changes": [
+          {
+            "before": "I'm embarking on an adventure to spend some time with my family. Could you confirm my travel details for me? Just a quick rundown: my name is Theodore Collins, born on September 14, 1985; I have a U.S. passport starting with 'US876543'.",
+            "after": "I'm embarking on an adventure to spend some time with my family. Could you confirm my travel details for me? Just a quick rundown: my name is Theodore Collins, born on September 14, 1985; I have a U.S. passport number is 'US876543'."
+          }
+        ]
+      },
+      "skills": [
+        "base"
       ]
     },
     {
@@ -476,7 +1082,7 @@
           [
             {
               "role": "user",
-              "content": "I'm embarking on an adventure to spend some time with my family. Could you confirm my travel details for me? Just a quick rundown: my name is Theodore Collins, born on September 14, 1985; I have a U.S. passport starting with 'US876543'."
+              "content": "I'm embarking on an adventure to spend some time with my family. Could you confirm my travel details for me? Just a quick rundown: my name is Theodore Collins, born on September 14, 1985; I have a U.S. passport number is 'US876543'."
             }
           ],
           [
@@ -534,6 +1140,20 @@
         [
           "cancel_booking(access_token='abc123xyz', booking_id='3426812')"
         ]
+      ],
+      "provenance": {
+        "kind": "adapted_bfcl",
+        "sourceId": "multi_turn_long_context_158",
+        "upstreamCommit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8",
+        "changes": [
+          {
+            "before": "I'm embarking on an adventure to spend some time with my family. Could you confirm my travel details for me? Just a quick rundown: my name is Theodore Collins, born on September 14, 1985; I have a U.S. passport starting with 'US876543'.",
+            "after": "I'm embarking on an adventure to spend some time with my family. Could you confirm my travel details for me? Just a quick rundown: my name is Theodore Collins, born on September 14, 1985; I have a U.S. passport number is 'US876543'."
+          }
+        ]
+      },
+      "skills": [
+        "long_context"
       ]
     },
     {
@@ -554,7 +1174,7 @@
           [
             {
               "role": "user",
-              "content": "You're right, I was born on September 14, 1985; I have a U.S. passport starting with 'US876543'"
+              "content": "You're right, I was born on September 14, 1985; I have a U.S. passport number is 'US876543'"
             }
           ],
           [
@@ -613,6 +1233,20 @@
         [
           "cancel_booking(access_token='abc123xyz', booking_id='3426812')"
         ]
+      ],
+      "provenance": {
+        "kind": "adapted_bfcl",
+        "sourceId": "multi_turn_miss_param_158",
+        "upstreamCommit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8",
+        "changes": [
+          {
+            "before": "You're right, I was born on September 14, 1985; I have a U.S. passport starting with 'US876543'",
+            "after": "You're right, I was born on September 14, 1985; I have a U.S. passport number is 'US876543'"
+          }
+        ]
+      },
+      "skills": [
+        "miss_param"
       ]
     },
     {
@@ -627,7 +1261,7 @@
           [
             {
               "role": "user",
-              "content": "I have to arrange a flight from San Francisco to Los Angeles for my journey next month November on two days after close of the 14th day in the year 2026. I'll be flying business class, and I'll be settling the payment using my American Express card with id 'AMEX123456789'. Would you be able to take care of this reservation using access token 'abc123xyz' for me? Just make sure I have enough money for the cost of the flight. I have around $8,000."
+              "content": "I have to arrange a flight from San Francisco to Los Angeles for my journey on November 16, 2026. I'll be flying business class, and I'll be settling the payment using my American Express card with id 'AMEX123456789'. Would you be able to take care of this reservation using access token 'abc123xyz' for me? Just make sure I have enough money for the cost of the flight. I have around $8,000."
             }
           ],
           [
@@ -675,6 +1309,20 @@
         [
           "cancel_booking(access_token='abc123xyz', booking_id='3426812')"
         ]
+      ],
+      "provenance": {
+        "kind": "adapted_bfcl",
+        "sourceId": "multi_turn_base_163",
+        "upstreamCommit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8",
+        "changes": [
+          {
+            "before": "I have to arrange a flight from San Francisco to Los Angeles for my journey next month November on two days after close of the 14th day in the year 2026. I'll be flying business class, and I'll be settling the payment using my American Express card with id 'AMEX123456789'. Would you be able to take care of this reservation using access token 'abc123xyz' for me? Just make sure I have enough money for the cost of the flight. I have around $8,000.",
+            "after": "I have to arrange a flight from San Francisco to Los Angeles for my journey on November 16, 2026. I'll be flying business class, and I'll be settling the payment using my American Express card with id 'AMEX123456789'. Would you be able to take care of this reservation using access token 'abc123xyz' for me? Just make sure I have enough money for the cost of the flight. I have around $8,000."
+          }
+        ]
+      },
+      "skills": [
+        "base"
       ]
     },
     {
@@ -689,7 +1337,7 @@
           [
             {
               "role": "user",
-              "content": "I have to arrange a flight from San Francisco to Los Angeles for my journey next month November on two days after close of the 14th day in the year 2026. I'll be flying business class, and I'll be settling the payment using my American Express card with id 'AMEX123456789'. Would you be able to take care of this reservation using access token 'abc123xyz' for me? Just make sure I have enough money for the cost of the flight. I havee around $8,000."
+              "content": "I have to arrange a flight from San Francisco to Los Angeles for my journey on November 16, 2026. I'll be flying business class, and I'll be settling the payment using my American Express card with id 'AMEX123456789'. Would you be able to take care of this reservation using access token 'abc123xyz' for me? Just make sure I have enough money for the cost of the flight. I havee around $8,000."
             }
           ],
           [
@@ -744,6 +1392,20 @@
         [
           "cancel_booking(access_token='abc123xyz', booking_id='3426812')"
         ]
+      ],
+      "provenance": {
+        "kind": "adapted_bfcl",
+        "sourceId": "multi_turn_miss_param_163",
+        "upstreamCommit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8",
+        "changes": [
+          {
+            "before": "I have to arrange a flight from San Francisco to Los Angeles for my journey next month November on two days after close of the 14th day in the year 2026. I'll be flying business class, and I'll be settling the payment using my American Express card with id 'AMEX123456789'. Would you be able to take care of this reservation using access token 'abc123xyz' for me? Just make sure I have enough money for the cost of the flight. I havee around $8,000.",
+            "after": "I have to arrange a flight from San Francisco to Los Angeles for my journey on November 16, 2026. I'll be flying business class, and I'll be settling the payment using my American Express card with id 'AMEX123456789'. Would you be able to take care of this reservation using access token 'abc123xyz' for me? Just make sure I have enough money for the cost of the flight. I havee around $8,000."
+          }
+        ]
+      },
+      "skills": [
+        "miss_param"
       ]
     },
     {
@@ -758,7 +1420,7 @@
           [
             {
               "role": "user",
-              "content": "I have to arrange a flight from San Francisco to Los Angeles for my journey next month November on two days after close of the 14th day in the year 2026. I'll be flying business class, and I'll be settling the payment using my American Express card with id 'AMEX123456789'. Would you be able to take care of this reservation using access token 'abc123xyz' for me? Just make sure I have enough money for the cost of the flight. I have around $8,000."
+              "content": "I have to arrange a flight from San Francisco to Los Angeles for my journey on November 16, 2026. I'll be flying business class, and I'll be settling the payment using my American Express card with id 'AMEX123456789'. Would you be able to take care of this reservation using access token 'abc123xyz' for me? Just make sure I have enough money for the cost of the flight. I have around $8,000."
             }
           ],
           [],
@@ -813,6 +1475,20 @@
         [
           "cancel_booking(access_token='abc123xyz', booking_id='3426812')"
         ]
+      ],
+      "provenance": {
+        "kind": "adapted_bfcl",
+        "sourceId": "multi_turn_miss_func_163",
+        "upstreamCommit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8",
+        "changes": [
+          {
+            "before": "I have to arrange a flight from San Francisco to Los Angeles for my journey next month November on two days after close of the 14th day in the year 2026. I'll be flying business class, and I'll be settling the payment using my American Express card with id 'AMEX123456789'. Would you be able to take care of this reservation using access token 'abc123xyz' for me? Just make sure I have enough money for the cost of the flight. I have around $8,000.",
+            "after": "I have to arrange a flight from San Francisco to Los Angeles for my journey on November 16, 2026. I'll be flying business class, and I'll be settling the payment using my American Express card with id 'AMEX123456789'. Would you be able to take care of this reservation using access token 'abc123xyz' for me? Just make sure I have enough money for the cost of the flight. I have around $8,000."
+          }
+        ]
+      },
+      "skills": [
+        "miss_func"
       ]
     },
     {
@@ -851,7 +1527,7 @@
           [
             {
               "role": "user",
-              "content": "Could you also provide me with an invoice for the recent flight booking that we decided to cancel? I'd like to make sure all the details are neatly documented."
+              "content": "Could you also provide me with an invoice for the recent flight booking that we decided to cancel? I'd like to make sure all the details are neatly documented. If that booking was cancelled, do not call any tool: explain that this simulated service cannot retrieve invoices for cancelled bookings."
             }
           ]
         ],
@@ -911,6 +1587,20 @@
           "cancel_booking(access_token='abc123xyz456', booking_id='3426812')"
         ],
         []
+      ],
+      "provenance": {
+        "kind": "adapted_bfcl",
+        "sourceId": "multi_turn_base_167",
+        "upstreamCommit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8",
+        "changes": [
+          {
+            "before": "Could you also provide me with an invoice for the recent flight booking that we decided to cancel? I'd like to make sure all the details are neatly documented.",
+            "after": "Could you also provide me with an invoice for the recent flight booking that we decided to cancel? I'd like to make sure all the details are neatly documented. If that booking was cancelled, do not call any tool: explain that this simulated service cannot retrieve invoices for cancelled bookings."
+          }
+        ]
+      },
+      "skills": [
+        "base"
       ]
     },
     {
@@ -949,7 +1639,7 @@
           [
             {
               "role": "user",
-              "content": "Could you also provide me with an invoice for the recent flight booking that we decided to cancel? I'd like to make sure all the details are neatly documented."
+              "content": "Could you also provide me with an invoice for the recent flight booking that we decided to cancel? I'd like to make sure all the details are neatly documented. If that booking was cancelled, do not call any tool: explain that this simulated service cannot retrieve invoices for cancelled bookings."
             }
           ]
         ],
@@ -1009,6 +1699,20 @@
           "cancel_booking(access_token='abc123xyz456', booking_id='3426812')"
         ],
         []
+      ],
+      "provenance": {
+        "kind": "adapted_bfcl",
+        "sourceId": "multi_turn_long_context_167",
+        "upstreamCommit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8",
+        "changes": [
+          {
+            "before": "Could you also provide me with an invoice for the recent flight booking that we decided to cancel? I'd like to make sure all the details are neatly documented.",
+            "after": "Could you also provide me with an invoice for the recent flight booking that we decided to cancel? I'd like to make sure all the details are neatly documented. If that booking was cancelled, do not call any tool: explain that this simulated service cannot retrieve invoices for cancelled bookings."
+          }
+        ]
+      },
+      "skills": [
+        "long_context"
       ]
     },
     {
@@ -1048,7 +1752,7 @@
           [
             {
               "role": "user",
-              "content": "Could you also provide me with an invoice for the recent flight booking that we decided to cancel? I'd like to make sure all the details are neatly documented."
+              "content": "Could you also provide me with an invoice for the recent flight booking that we decided to cancel? I'd like to make sure all the details are neatly documented. If that booking was cancelled, do not call any tool: explain that this simulated service cannot retrieve invoices for cancelled bookings."
             }
           ]
         ],
@@ -1114,6 +1818,20 @@
           "cancel_booking(access_token='abc123xyz456', booking_id='3426812')"
         ],
         []
+      ],
+      "provenance": {
+        "kind": "adapted_bfcl",
+        "sourceId": "multi_turn_miss_func_167",
+        "upstreamCommit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8",
+        "changes": [
+          {
+            "before": "Could you also provide me with an invoice for the recent flight booking that we decided to cancel? I'd like to make sure all the details are neatly documented.",
+            "after": "Could you also provide me with an invoice for the recent flight booking that we decided to cancel? I'd like to make sure all the details are neatly documented. If that booking was cancelled, do not call any tool: explain that this simulated service cannot retrieve invoices for cancelled bookings."
+          }
+        ]
+      },
+      "skills": [
+        "miss_func"
       ]
     },
     {
@@ -1128,7 +1846,7 @@
           [
             {
               "role": "user",
-              "content": "As I'm in the process of planning an upcoming journey, I have specific departure and arrival cities in mind. Could you assist in estimating the airfare between ORD and SVP from the comprehensive list available through the system? Please note, I am considering traveling next weekend July 14th, 2026 with a preference for a business class seat."
+              "content": "As I'm in the process of planning an upcoming journey, I have specific departure and arrival cities in mind. Could you assist in estimating the airfare between ORD and SVP from the comprehensive list available through the system? Please note, I am considering traveling on July 14th, 2026 with a preference for a business class seat."
             }
           ],
           [
@@ -1182,6 +1900,20 @@
         [
           "set_budget_limit(access_token='abc123xyz456', budget_limit=20000.0)"
         ]
+      ],
+      "provenance": {
+        "kind": "adapted_bfcl",
+        "sourceId": "multi_turn_base_182",
+        "upstreamCommit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8",
+        "changes": [
+          {
+            "before": "As I'm in the process of planning an upcoming journey, I have specific departure and arrival cities in mind. Could you assist in estimating the airfare between ORD and SVP from the comprehensive list available through the system? Please note, I am considering traveling next weekend July 14th, 2026 with a preference for a business class seat.",
+            "after": "As I'm in the process of planning an upcoming journey, I have specific departure and arrival cities in mind. Could you assist in estimating the airfare between ORD and SVP from the comprehensive list available through the system? Please note, I am considering traveling on July 14th, 2026 with a preference for a business class seat."
+          }
+        ]
+      },
+      "skills": [
+        "base"
       ]
     },
     {
@@ -1196,7 +1928,7 @@
           [
             {
               "role": "user",
-              "content": "As I'm in the process of planning an upcoming journey, I have specific departure and arrival cities in mind. Could you assist in estimating the airfare between ORD and SVP from the comprehensive list available through the system? Please note, I am considering traveling next weekend July 14th, 2026 with a preference for a business class seat."
+              "content": "As I'm in the process of planning an upcoming journey, I have specific departure and arrival cities in mind. Could you assist in estimating the airfare between ORD and SVP from the comprehensive list available through the system? Please note, I am considering traveling on July 14th, 2026 with a preference for a business class seat."
             }
           ],
           [
@@ -1257,6 +1989,20 @@
         [
           "set_budget_limit(access_token='abc123xyz456', budget_limit=20000.0)"
         ]
+      ],
+      "provenance": {
+        "kind": "adapted_bfcl",
+        "sourceId": "multi_turn_miss_param_182",
+        "upstreamCommit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8",
+        "changes": [
+          {
+            "before": "As I'm in the process of planning an upcoming journey, I have specific departure and arrival cities in mind. Could you assist in estimating the airfare between ORD and SVP from the comprehensive list available through the system? Please note, I am considering traveling next weekend July 14th, 2026 with a preference for a business class seat.",
+            "after": "As I'm in the process of planning an upcoming journey, I have specific departure and arrival cities in mind. Could you assist in estimating the airfare between ORD and SVP from the comprehensive list available through the system? Please note, I am considering traveling on July 14th, 2026 with a preference for a business class seat."
+          }
+        ]
+      },
+      "skills": [
+        "miss_param"
       ]
     },
     {
@@ -1346,6 +2092,15 @@
         [
           "cancel_booking(access_token='auth_token_987654321', booking_id='3426812')"
         ]
+      ],
+      "provenance": {
+        "kind": "bfcl",
+        "sourceId": "multi_turn_base_191",
+        "upstreamCommit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8",
+        "changes": []
+      },
+      "skills": [
+        "base"
       ]
     },
     {
@@ -1435,6 +2190,15 @@
         [
           "cancel_booking(access_token='auth_token_987654321', booking_id='3426812')"
         ]
+      ],
+      "provenance": {
+        "kind": "bfcl",
+        "sourceId": "multi_turn_long_context_191",
+        "upstreamCommit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8",
+        "changes": []
+      },
+      "skills": [
+        "long_context"
       ]
     },
     {
@@ -1531,6 +2295,15 @@
         [
           "cancel_booking(access_token='auth_token_987654321', booking_id='3426812')"
         ]
+      ],
+      "provenance": {
+        "kind": "bfcl",
+        "sourceId": "multi_turn_miss_param_191",
+        "upstreamCommit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8",
+        "changes": []
+      },
+      "skills": [
+        "miss_param"
       ]
     },
     {
@@ -1623,6 +2396,15 @@
         [
           "retrieve_invoice(access_token='ABCDE12345', booking_id='3426812')"
         ]
+      ],
+      "provenance": {
+        "kind": "bfcl",
+        "sourceId": "multi_turn_base_192",
+        "upstreamCommit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8",
+        "changes": []
+      },
+      "skills": [
+        "base"
       ]
     },
     {
@@ -1722,6 +2504,15 @@
         [
           "retrieve_invoice(access_token='ABCDE12345', booking_id='3426812')"
         ]
+      ],
+      "provenance": {
+        "kind": "bfcl",
+        "sourceId": "multi_turn_miss_param_192",
+        "upstreamCommit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8",
+        "changes": []
+      },
+      "skills": [
+        "miss_param"
       ]
     },
     {
@@ -1821,6 +2612,15 @@
         [
           "retrieve_invoice(access_token='ABCDE12345', booking_id='3426812')"
         ]
+      ],
+      "provenance": {
+        "kind": "bfcl",
+        "sourceId": "multi_turn_miss_func_192",
+        "upstreamCommit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8",
+        "changes": []
+      },
+      "skills": [
+        "miss_func"
       ]
     },
     {
@@ -1835,13 +2635,13 @@
           [
             {
               "role": "user",
-              "content": "I need to schedule a flight soon on booking id 1234 and want to examine different alternatives. Calculate the cost of a business class ticket for the first airport on the available list to the last airport on the same list, on the last day of October 2026. Provide the estimated total payable amount for me."
+              "content": "I need to schedule a flight soon and want to examine different alternatives. Calculate the cost of a business class ticket for the first airport on the available list to the last airport on the same list, on the last day of October 2026. Provide the estimated total payable amount for me."
             }
           ],
           [
             {
               "role": "user",
-              "content": "After determining the flight prices, arrange to reserve a business class seat with those specifics using my card with id main1234 and authorization token 'abc123xyz', once you've gotten full approval."
+              "content": "After determining the flight prices, arrange to reserve a business class seat with those specifics using my card with id main1234 and authorization token 'abc123xyz', with my explicit approval now."
             }
           ],
           [
@@ -1859,7 +2659,7 @@
           [
             {
               "role": "user",
-              "content": "There's an urgent matter I need solved. Reach out to customer service for me and relay my booking-related query."
+              "content": "There's an urgent matter I need solved. Reach out to customer service for me and send this exact message about my current booking: \"Booking-related query.\"."
             }
           ],
           [
@@ -1924,6 +2724,28 @@
         [
           "cancel_booking(access_token='abc123xyz', booking_id='3426812')"
         ]
+      ],
+      "provenance": {
+        "kind": "adapted_bfcl",
+        "sourceId": "multi_turn_base_194",
+        "upstreamCommit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8",
+        "changes": [
+          {
+            "before": "I need to schedule a flight soon on booking id 1234 and want to examine different alternatives. Calculate the cost of a business class ticket for the first airport on the available list to the last airport on the same list, on the last day of October 2026. Provide the estimated total payable amount for me.",
+            "after": "I need to schedule a flight soon and want to examine different alternatives. Calculate the cost of a business class ticket for the first airport on the available list to the last airport on the same list, on the last day of October 2026. Provide the estimated total payable amount for me."
+          },
+          {
+            "before": "After determining the flight prices, arrange to reserve a business class seat with those specifics using my card with id main1234 and authorization token 'abc123xyz', once you've gotten full approval.",
+            "after": "After determining the flight prices, arrange to reserve a business class seat with those specifics using my card with id main1234 and authorization token 'abc123xyz', with my explicit approval now."
+          },
+          {
+            "before": "There's an urgent matter I need solved. Reach out to customer service for me and relay my booking-related query.",
+            "after": "There's an urgent matter I need solved. Reach out to customer service for me and send this exact message about my current booking: \"Booking-related query.\"."
+          }
+        ]
+      },
+      "skills": [
+        "base"
       ]
     },
     {
@@ -1938,13 +2760,13 @@
           [
             {
               "role": "user",
-              "content": "I need to schedule a flight soon on booking id 1234 and want to examine different alternatives. Calculate the cost of a business class ticket for the first airport on the available list to the last airport on the same list, on the last day of October 2026. Provide the estimated total payable amount for me."
+              "content": "I need to schedule a flight soon and want to examine different alternatives. Calculate the cost of a business class ticket for the first airport on the available list to the last airport on the same list, on the last day of October 2026. Provide the estimated total payable amount for me."
             }
           ],
           [
             {
               "role": "user",
-              "content": "After determining the flight prices, arrange to reserve a business class seat with those specifics using my card with id main1234 and authorization token 'abc123xyz', once you've gotten full approval."
+              "content": "After determining the flight prices, arrange to reserve a business class seat with those specifics using my card with id main1234 and authorization token 'abc123xyz', with my explicit approval now."
             }
           ],
           [
@@ -1962,7 +2784,7 @@
           [
             {
               "role": "user",
-              "content": "There's an urgent matter I need solved. Reach out to customer service for me and relay my booking-related query."
+              "content": "There's an urgent matter I need solved. Reach out to customer service for me and send this exact message about my current booking: \"Booking-related query.\"."
             }
           ],
           [
@@ -2027,6 +2849,28 @@
         [
           "cancel_booking(access_token='abc123xyz', booking_id='3426812')"
         ]
+      ],
+      "provenance": {
+        "kind": "adapted_bfcl",
+        "sourceId": "multi_turn_long_context_194",
+        "upstreamCommit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8",
+        "changes": [
+          {
+            "before": "I need to schedule a flight soon on booking id 1234 and want to examine different alternatives. Calculate the cost of a business class ticket for the first airport on the available list to the last airport on the same list, on the last day of October 2026. Provide the estimated total payable amount for me.",
+            "after": "I need to schedule a flight soon and want to examine different alternatives. Calculate the cost of a business class ticket for the first airport on the available list to the last airport on the same list, on the last day of October 2026. Provide the estimated total payable amount for me."
+          },
+          {
+            "before": "After determining the flight prices, arrange to reserve a business class seat with those specifics using my card with id main1234 and authorization token 'abc123xyz', once you've gotten full approval.",
+            "after": "After determining the flight prices, arrange to reserve a business class seat with those specifics using my card with id main1234 and authorization token 'abc123xyz', with my explicit approval now."
+          },
+          {
+            "before": "There's an urgent matter I need solved. Reach out to customer service for me and relay my booking-related query.",
+            "after": "There's an urgent matter I need solved. Reach out to customer service for me and send this exact message about my current booking: \"Booking-related query.\"."
+          }
+        ]
+      },
+      "skills": [
+        "long_context"
       ]
     },
     {
@@ -2041,13 +2885,13 @@
           [
             {
               "role": "user",
-              "content": "I need to schedule a flight soon on booking id 1234 and want to examine different alternatives. Calculate the cost of a business class ticket for the first airport on the available list to the last airport on the same list, on the last day of October 2026. Provide the estimated total payable amount for me."
+              "content": "I need to schedule a flight soon and want to examine different alternatives. Calculate the cost of a business class ticket for the first airport on the available list to the last airport on the same list, on the last day of October 2026. Provide the estimated total payable amount for me."
             }
           ],
           [
             {
               "role": "user",
-              "content": "After determining the flight prices, arrange to reserve a business class seat with those specifics using my card with id main1234 and authorization token 'abc123xyz', once you've gotten full approval."
+              "content": "After determining the flight prices, arrange to reserve a business class seat with those specifics using my card with id main1234 and authorization token 'abc123xyz', with my explicit approval now."
             }
           ],
           [
@@ -2071,7 +2915,7 @@
           [
             {
               "role": "user",
-              "content": "There's an urgent matter I need solved. Reach out to customer service for me and relay my booking-related query."
+              "content": "There's an urgent matter I need solved. Reach out to customer service for me and send this exact message about my current booking: \"Booking-related query.\"."
             }
           ],
           [
@@ -2137,7 +2981,886 @@
         [
           "cancel_booking(access_token='abc123xyz', booking_id='3426812')"
         ]
+      ],
+      "provenance": {
+        "kind": "adapted_bfcl",
+        "sourceId": "multi_turn_miss_param_194",
+        "upstreamCommit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8",
+        "changes": [
+          {
+            "before": "I need to schedule a flight soon on booking id 1234 and want to examine different alternatives. Calculate the cost of a business class ticket for the first airport on the available list to the last airport on the same list, on the last day of October 2026. Provide the estimated total payable amount for me.",
+            "after": "I need to schedule a flight soon and want to examine different alternatives. Calculate the cost of a business class ticket for the first airport on the available list to the last airport on the same list, on the last day of October 2026. Provide the estimated total payable amount for me."
+          },
+          {
+            "before": "After determining the flight prices, arrange to reserve a business class seat with those specifics using my card with id main1234 and authorization token 'abc123xyz', once you've gotten full approval.",
+            "after": "After determining the flight prices, arrange to reserve a business class seat with those specifics using my card with id main1234 and authorization token 'abc123xyz', with my explicit approval now."
+          },
+          {
+            "before": "There's an urgent matter I need solved. Reach out to customer service for me and relay my booking-related query.",
+            "after": "There's an urgent matter I need solved. Reach out to customer service for me and send this exact message about my current booking: \"Booking-related query.\"."
+          }
+        ]
+      },
+      "skills": [
+        "miss_param"
       ]
+    },
+    {
+      "id": "multi_turn_base_2100",
+      "family": "2100",
+      "title": "여행자 확인부터 도시 조회와 예약까지",
+      "label": "F21",
+      "category": "base",
+      "skills": [
+        "base",
+        "multi_turn"
+      ],
+      "entry": {
+        "id": "multi_turn_base_2100",
+        "question": [
+          [
+            {
+              "role": "user",
+              "content": "Verify traveller Mina Park, date of birth 1996-04-12, complete passport number US7654321."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Find the airports for London and Paris."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Quote business class from the first city to the second on 2027-05-09."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Book that trip. Use access token workshop-token-2100 and card ID card-2100."
+            }
+          ]
+        ],
+        "initial_config": {
+          "TravelAPI": {
+            "random_seed": 572100,
+            "credit_card_list": {
+              "card-2100": {
+                "balance": 50000.0
+              }
+            },
+            "booking_record": {},
+            "access_token": "workshop-token-2100",
+            "token_expires_in": 100,
+            "token_type": "Bearer",
+            "token_scope": "read_write",
+            "budget_limit": null,
+            "user_first_name": "Mina",
+            "user_last_name": "Park"
+          }
+        },
+        "involved_classes": [
+          "TravelAPI"
+        ],
+        "path": []
+      },
+      "ground_truth": [
+        [
+          "verify_traveler_information(first_name='Mina', last_name='Park', date_of_birth='1996-04-12', passport_number='US7654321')"
+        ],
+        [
+          "get_nearest_airport_by_city(location='London')",
+          "get_nearest_airport_by_city(location='Paris')"
+        ],
+        [
+          "get_flight_cost(travel_from='LHR', travel_to='CDG', travel_date='2027-05-09', travel_class='business')"
+        ],
+        [
+          "book_flight(access_token='workshop-token-2100', card_id='card-2100', travel_from='LHR', travel_to='CDG', travel_date='2027-05-09', travel_class='business')"
+        ]
+      ],
+      "provenance": {
+        "kind": "authored",
+        "version": "workshop-v2",
+        "notes": "New teaching scenario using unchanged BFCL TravelAPI and checker; not an official BFCL question."
+      }
+    },
+    {
+      "id": "multi_turn_base_2101",
+      "family": "2101",
+      "title": "카드 조회와 잔액 확인 후 여행 예약",
+      "label": "F22",
+      "category": "base",
+      "skills": [
+        "base",
+        "multi_turn"
+      ],
+      "entry": {
+        "id": "multi_turn_base_2101",
+        "question": [
+          [
+            {
+              "role": "user",
+              "content": "List all registered credit cards."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Check the balance of the card whose ID is card-2101. My access token is workshop-token-2101."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Set my account budget to $4000."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Book economy ORD to LAX for 2027-05-22 using that card and token."
+            }
+          ]
+        ],
+        "initial_config": {
+          "TravelAPI": {
+            "random_seed": 572101,
+            "credit_card_list": {
+              "card-2101": {
+                "balance": 50000.0
+              }
+            },
+            "booking_record": {},
+            "access_token": "workshop-token-2101",
+            "token_expires_in": 100,
+            "token_type": "Bearer",
+            "token_scope": "read_write",
+            "budget_limit": null,
+            "user_first_name": "Mina",
+            "user_last_name": "Park"
+          }
+        },
+        "involved_classes": [
+          "TravelAPI"
+        ],
+        "path": []
+      },
+      "ground_truth": [
+        [
+          "get_all_credit_cards()"
+        ],
+        [
+          "get_credit_card_balance(access_token='workshop-token-2101', card_id='card-2101')"
+        ],
+        [
+          "set_budget_limit(access_token='workshop-token-2101', budget_limit=4000)"
+        ],
+        [
+          "book_flight(access_token='workshop-token-2101', card_id='card-2101', travel_from='ORD', travel_to='LAX', travel_date='2027-05-22', travel_class='economy')"
+        ]
+      ],
+      "provenance": {
+        "kind": "authored",
+        "version": "workshop-v2",
+        "notes": "New teaching scenario using unchanged BFCL TravelAPI and checker; not an official BFCL question."
+      }
+    },
+    {
+      "id": "multi_turn_base_2102",
+      "family": "2102",
+      "title": "결제 카드 누락 후 이어지는 예약과 취소",
+      "label": "F23",
+      "category": "miss_param",
+      "skills": [
+        "miss_param",
+        "multi_turn"
+      ],
+      "entry": {
+        "id": "multi_turn_base_2102",
+        "question": [
+          [
+            {
+              "role": "user",
+              "content": "Book economy LAX to HND for 2027-06-10 using access token workshop-token-2102. I have not supplied a card ID. Ask for it before any tool call."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "The card ID is card-2102."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Get the invoice for that booking."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Cancel it."
+            }
+          ]
+        ],
+        "initial_config": {
+          "TravelAPI": {
+            "random_seed": 572102,
+            "credit_card_list": {
+              "card-2102": {
+                "balance": 50000.0
+              }
+            },
+            "booking_record": {},
+            "access_token": "workshop-token-2102",
+            "token_expires_in": 100,
+            "token_type": "Bearer",
+            "token_scope": "read_write",
+            "budget_limit": null,
+            "user_first_name": "Mina",
+            "user_last_name": "Park"
+          }
+        },
+        "involved_classes": [
+          "TravelAPI"
+        ],
+        "path": []
+      },
+      "ground_truth": [
+        [],
+        [
+          "book_flight(access_token='workshop-token-2102', card_id='card-2102', travel_from='LAX', travel_to='HND', travel_date='2027-06-10', travel_class='economy')"
+        ],
+        [
+          "retrieve_invoice(access_token='workshop-token-2102', booking_id='7826594')"
+        ],
+        [
+          "cancel_booking(access_token='workshop-token-2102', booking_id='7826594')"
+        ]
+      ],
+      "provenance": {
+        "kind": "authored",
+        "version": "workshop-v2",
+        "notes": "New teaching scenario using unchanged BFCL TravelAPI and checker; not an official BFCL question."
+      }
+    },
+    {
+      "id": "multi_turn_base_2103",
+      "family": "2103",
+      "title": "누락된 여행자 정보 보완과 후속 운임 조회",
+      "label": "F24",
+      "category": "miss_param",
+      "skills": [
+        "miss_param",
+        "multi_turn"
+      ],
+      "entry": {
+        "id": "multi_turn_base_2103",
+        "question": [
+          [
+            {
+              "role": "user",
+              "content": "Verify traveller Mina Park, complete passport number US774455. My birth date is missing; ask me and use no tool yet."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "My birth date is 1992-11-23."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Find the airport for Boston."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Quote an economy flight from JFK to that airport on 2027-06-18."
+            }
+          ]
+        ],
+        "initial_config": {
+          "TravelAPI": {
+            "random_seed": 572103,
+            "credit_card_list": {
+              "card-2103": {
+                "balance": 50000.0
+              }
+            },
+            "booking_record": {},
+            "access_token": "workshop-token-2103",
+            "token_expires_in": 100,
+            "token_type": "Bearer",
+            "token_scope": "read_write",
+            "budget_limit": null,
+            "user_first_name": "Mina",
+            "user_last_name": "Park"
+          }
+        },
+        "involved_classes": [
+          "TravelAPI"
+        ],
+        "path": []
+      },
+      "ground_truth": [
+        [],
+        [
+          "verify_traveler_information(first_name='Mina', last_name='Park', date_of_birth='1992-11-23', passport_number='US774455')"
+        ],
+        [
+          "get_nearest_airport_by_city(location='Boston')"
+        ],
+        [
+          "get_flight_cost(travel_from='JFK', travel_to='BOS', travel_date='2027-06-18', travel_class='economy')"
+        ]
+      ],
+      "provenance": {
+        "kind": "authored",
+        "version": "workshop-v2",
+        "notes": "New teaching scenario using unchanged BFCL TravelAPI and checker; not an official BFCL question."
+      }
+    },
+    {
+      "id": "multi_turn_base_2104",
+      "family": "2104",
+      "title": "예약과 보험의 전체 실행 가능성 확인",
+      "label": "F25",
+      "category": "miss_func",
+      "skills": [
+        "miss_func",
+        "multi_turn"
+      ],
+      "entry": {
+        "id": "multi_turn_base_2104",
+        "question": [
+          [
+            {
+              "role": "user",
+              "content": "Book economy JFK to ORD for 2027-07-05 and purchase comprehensive insurance costing $125 for it. If either capability is unavailable, perform neither action until restored. Use access token workshop-token-2104 and card ID card-2104."
+            }
+          ],
+          [],
+          [
+            {
+              "role": "user",
+              "content": "Retrieve the flight booking invoice."
+            }
+          ]
+        ],
+        "initial_config": {
+          "TravelAPI": {
+            "random_seed": 572104,
+            "credit_card_list": {
+              "card-2104": {
+                "balance": 50000.0
+              }
+            },
+            "booking_record": {},
+            "access_token": "workshop-token-2104",
+            "token_expires_in": 100,
+            "token_type": "Bearer",
+            "token_scope": "read_write",
+            "budget_limit": null,
+            "user_first_name": "Mina",
+            "user_last_name": "Park"
+          }
+        },
+        "involved_classes": [
+          "TravelAPI"
+        ],
+        "path": [],
+        "missed_function": {
+          "1": [
+            "purchase_insurance"
+          ]
+        }
+      },
+      "ground_truth": [
+        [],
+        [
+          "book_flight(access_token='workshop-token-2104', card_id='card-2104', travel_from='JFK', travel_to='ORD', travel_date='2027-07-05', travel_class='economy')",
+          "purchase_insurance(access_token='workshop-token-2104', insurance_type='comprehensive', insurance_cost=125, booking_id='8337775', card_id='card-2104')"
+        ],
+        [
+          "retrieve_invoice(access_token='workshop-token-2104', booking_id='8337775')"
+        ]
+      ],
+      "provenance": {
+        "kind": "authored",
+        "version": "workshop-v2",
+        "notes": "New teaching scenario using unchanged BFCL TravelAPI and checker; not an official BFCL question."
+      }
+    },
+    {
+      "id": "multi_turn_base_2105",
+      "family": "2105",
+      "title": "취소 도구가 돌아온 뒤 기존 예약 취소",
+      "label": "F26",
+      "category": "miss_func",
+      "skills": [
+        "miss_func",
+        "multi_turn"
+      ],
+      "entry": {
+        "id": "multi_turn_base_2105",
+        "question": [
+          [
+            {
+              "role": "user",
+              "content": "Book business SFO to LAX on 2027-07-14. Use access token workshop-token-2105 and card ID card-2105."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Cancel that booking. If cancellation is unavailable, call no other tool and wait for it to return."
+            }
+          ],
+          []
+        ],
+        "initial_config": {
+          "TravelAPI": {
+            "random_seed": 572105,
+            "credit_card_list": {
+              "card-2105": {
+                "balance": 50000.0
+              }
+            },
+            "booking_record": {},
+            "access_token": "workshop-token-2105",
+            "token_expires_in": 100,
+            "token_type": "Bearer",
+            "token_scope": "read_write",
+            "budget_limit": null,
+            "user_first_name": "Mina",
+            "user_last_name": "Park"
+          }
+        },
+        "involved_classes": [
+          "TravelAPI"
+        ],
+        "path": [],
+        "missed_function": {
+          "2": [
+            "cancel_booking"
+          ]
+        }
+      },
+      "ground_truth": [
+        [
+          "book_flight(access_token='workshop-token-2105', card_id='card-2105', travel_from='SFO', travel_to='LAX', travel_date='2027-07-14', travel_class='business')"
+        ],
+        [],
+        [
+          "cancel_booking(access_token='workshop-token-2105', booking_id='2004186')"
+        ]
+      ],
+      "provenance": {
+        "kind": "authored",
+        "version": "workshop-v2",
+        "notes": "New teaching scenario using unchanged BFCL TravelAPI and checker; not an official BFCL question."
+      }
+    },
+    {
+      "id": "multi_turn_base_2106",
+      "family": "2106",
+      "title": "세 예약의 이전 참조와 취소 상태 유지",
+      "label": "F27",
+      "category": "memory",
+      "skills": [
+        "memory",
+        "multi_turn"
+      ],
+      "entry": {
+        "id": "multi_turn_base_2106",
+        "question": [
+          [
+            {
+              "role": "user",
+              "content": "Book economy ORD to BOS on 2027-09-01. Use access token workshop-token-2106 and card ID card-2106."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Separately book business ORD to LAX on 2027-09-03 with the same token and card."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Add a third booking, first class SFO to JFK on 2027-09-09, same token and card."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Cancel only the Los Angeles reservation."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Get the invoice for the earliest Boston trip, which is still active."
+            }
+          ]
+        ],
+        "initial_config": {
+          "TravelAPI": {
+            "random_seed": 572106,
+            "credit_card_list": {
+              "card-2106": {
+                "balance": 50000.0
+              }
+            },
+            "booking_record": {},
+            "access_token": "workshop-token-2106",
+            "token_expires_in": 100,
+            "token_type": "Bearer",
+            "token_scope": "read_write",
+            "budget_limit": null,
+            "user_first_name": "Mina",
+            "user_last_name": "Park"
+          }
+        },
+        "involved_classes": [
+          "TravelAPI"
+        ],
+        "path": []
+      },
+      "ground_truth": [
+        [
+          "book_flight(access_token='workshop-token-2106', card_id='card-2106', travel_from='ORD', travel_to='BOS', travel_date='2027-09-01', travel_class='economy')"
+        ],
+        [
+          "book_flight(access_token='workshop-token-2106', card_id='card-2106', travel_from='ORD', travel_to='LAX', travel_date='2027-09-03', travel_class='business')"
+        ],
+        [
+          "book_flight(access_token='workshop-token-2106', card_id='card-2106', travel_from='SFO', travel_to='JFK', travel_date='2027-09-09', travel_class='first')"
+        ],
+        [
+          "cancel_booking(access_token='workshop-token-2106', booking_id='2252601')"
+        ],
+        [
+          "retrieve_invoice(access_token='workshop-token-2106', booking_id='5848244')"
+        ]
+      ],
+      "provenance": {
+        "kind": "authored",
+        "version": "workshop-v2",
+        "notes": "New teaching scenario using unchanged BFCL TravelAPI and checker; not an official BFCL question."
+      }
+    },
+    {
+      "id": "multi_turn_long_context_2107",
+      "family": "2107",
+      "title": "확장 예약 기록에서 두 대상 구분",
+      "label": "F28",
+      "category": "long_context",
+      "skills": [
+        "long_context",
+        "multi_turn"
+      ],
+      "entry": {
+        "id": "multi_turn_long_context_2107",
+        "question": [
+          [
+            {
+              "role": "user",
+              "content": "Show my booking history. Use access token workshop-token-2107 and card ID card-2107."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Cancel only the SFO to LAX business trip on 2027-08-09."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Get the invoice for SFO to BOS business on 2027-08-10. Do not use the cancelled trip."
+            }
+          ]
+        ],
+        "initial_config": {
+          "TravelAPI": {
+            "random_seed": 572107,
+            "credit_card_list": {
+              "card-2107": {
+                "balance": 50000.0
+              }
+            },
+            "booking_record": {
+              "reservation-2107-0": {
+                "transaction_id": "txn-2107-0",
+                "travel_date": "2027-08-01",
+                "travel_from": "SFO",
+                "travel_to": "LAX",
+                "travel_class": "economy",
+                "travel_cost": 300.0,
+                "card_id": "card-2107"
+              },
+              "reservation-2107-1": {
+                "transaction_id": "txn-2107-1",
+                "travel_date": "2027-08-02",
+                "travel_from": "SFO",
+                "travel_to": "BOS",
+                "travel_class": "economy",
+                "travel_cost": 320.0,
+                "card_id": "card-2107"
+              },
+              "reservation-2107-2": {
+                "transaction_id": "txn-2107-2",
+                "travel_date": "2027-08-03",
+                "travel_from": "SFO",
+                "travel_to": "LAX",
+                "travel_class": "economy",
+                "travel_cost": 340.0,
+                "card_id": "card-2107"
+              },
+              "reservation-2107-3": {
+                "transaction_id": "txn-2107-3",
+                "travel_date": "2027-08-04",
+                "travel_from": "SFO",
+                "travel_to": "BOS",
+                "travel_class": "economy",
+                "travel_cost": 360.0,
+                "card_id": "card-2107"
+              },
+              "reservation-2107-4": {
+                "transaction_id": "txn-2107-4",
+                "travel_date": "2027-08-05",
+                "travel_from": "SFO",
+                "travel_to": "LAX",
+                "travel_class": "economy",
+                "travel_cost": 380.0,
+                "card_id": "card-2107"
+              },
+              "reservation-2107-5": {
+                "transaction_id": "txn-2107-5",
+                "travel_date": "2027-08-06",
+                "travel_from": "SFO",
+                "travel_to": "BOS",
+                "travel_class": "business",
+                "travel_cost": 400.0,
+                "card_id": "card-2107"
+              },
+              "reservation-2107-6": {
+                "transaction_id": "txn-2107-6",
+                "travel_date": "2027-08-07",
+                "travel_from": "SFO",
+                "travel_to": "LAX",
+                "travel_class": "business",
+                "travel_cost": 420.0,
+                "card_id": "card-2107"
+              },
+              "reservation-2107-7": {
+                "transaction_id": "txn-2107-7",
+                "travel_date": "2027-08-08",
+                "travel_from": "SFO",
+                "travel_to": "BOS",
+                "travel_class": "business",
+                "travel_cost": 440.0,
+                "card_id": "card-2107"
+              },
+              "reservation-2107-8": {
+                "transaction_id": "txn-2107-8",
+                "travel_date": "2027-08-09",
+                "travel_from": "SFO",
+                "travel_to": "LAX",
+                "travel_class": "business",
+                "travel_cost": 460.0,
+                "card_id": "card-2107"
+              },
+              "reservation-2107-9": {
+                "transaction_id": "txn-2107-9",
+                "travel_date": "2027-08-10",
+                "travel_from": "SFO",
+                "travel_to": "BOS",
+                "travel_class": "business",
+                "travel_cost": 480.0,
+                "card_id": "card-2107"
+              }
+            },
+            "access_token": "workshop-token-2107",
+            "token_expires_in": 100,
+            "token_type": "Bearer",
+            "token_scope": "read_write",
+            "budget_limit": null,
+            "user_first_name": "Mina",
+            "user_last_name": "Park"
+          }
+        },
+        "involved_classes": [
+          "TravelAPI"
+        ],
+        "path": []
+      },
+      "ground_truth": [
+        [
+          "get_booking_history(access_token='workshop-token-2107')"
+        ],
+        [
+          "cancel_booking(access_token='workshop-token-2107', booking_id='reservation-2107-8')"
+        ],
+        [
+          "retrieve_invoice(access_token='workshop-token-2107', booking_id='reservation-2107-9')"
+        ]
+      ],
+      "provenance": {
+        "kind": "authored",
+        "version": "workshop-v2",
+        "notes": "New teaching scenario using unchanged BFCL TravelAPI and checker; not an official BFCL question."
+      }
+    },
+    {
+      "id": "multi_turn_base_2108",
+      "family": "2108",
+      "title": "운임 상한 변경과 중복 예약 방지",
+      "label": "F29",
+      "category": "conditional",
+      "skills": [
+        "conditional",
+        "multi_turn"
+      ],
+      "entry": {
+        "id": "multi_turn_base_2108",
+        "question": [
+          [
+            {
+              "role": "user",
+              "content": "Quote a first-class flight JFK to HND for 2027-10-04. Reserve it only if the fare is at most $60. Do not set an account budget. Use access token workshop-token-2108 and card ID card-2108."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "My new approved maximum fare is $10000. Book the same trip if it fits; leave account budget unchanged."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "Please show the invoice of that existing reservation. Do not create another reservation."
+            }
+          ]
+        ],
+        "initial_config": {
+          "TravelAPI": {
+            "random_seed": 572108,
+            "credit_card_list": {
+              "card-2108": {
+                "balance": 50000.0
+              }
+            },
+            "booking_record": {},
+            "access_token": "workshop-token-2108",
+            "token_expires_in": 100,
+            "token_type": "Bearer",
+            "token_scope": "read_write",
+            "budget_limit": null,
+            "user_first_name": "Mina",
+            "user_last_name": "Park"
+          }
+        },
+        "involved_classes": [
+          "TravelAPI"
+        ],
+        "path": []
+      },
+      "ground_truth": [
+        [
+          "get_flight_cost(travel_from='JFK', travel_to='HND', travel_date='2027-10-04', travel_class='first')"
+        ],
+        [
+          "book_flight(access_token='workshop-token-2108', card_id='card-2108', travel_from='JFK', travel_to='HND', travel_date='2027-10-04', travel_class='first')"
+        ],
+        [
+          "retrieve_invoice(access_token='workshop-token-2108', booking_id='2802478')"
+        ]
+      ],
+      "provenance": {
+        "kind": "authored",
+        "version": "workshop-v2",
+        "notes": "New teaching scenario using unchanged BFCL TravelAPI and checker; not an official BFCL question."
+      }
+    },
+    {
+      "id": "multi_turn_base_2109",
+      "family": "2109",
+      "title": "명시적인 취소 요청이 오기 전 행동 보류",
+      "label": "F30",
+      "category": "conditional",
+      "skills": [
+        "conditional",
+        "multi_turn"
+      ],
+      "entry": {
+        "id": "multi_turn_base_2109",
+        "question": [
+          [
+            {
+              "role": "user",
+              "content": "Book economy SFO to ORD for 2027-10-19. Use access token workshop-token-2109 and card ID card-2109."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "I might change my plans, but I have not decided. Do not cancel, look anything up, or call any tool yet; just acknowledge."
+            }
+          ],
+          [
+            {
+              "role": "user",
+              "content": "I have decided: cancel that reservation now."
+            }
+          ]
+        ],
+        "initial_config": {
+          "TravelAPI": {
+            "random_seed": 572109,
+            "credit_card_list": {
+              "card-2109": {
+                "balance": 50000.0
+              }
+            },
+            "booking_record": {},
+            "access_token": "workshop-token-2109",
+            "token_expires_in": 100,
+            "token_type": "Bearer",
+            "token_scope": "read_write",
+            "budget_limit": null,
+            "user_first_name": "Mina",
+            "user_last_name": "Park"
+          }
+        },
+        "involved_classes": [
+          "TravelAPI"
+        ],
+        "path": []
+      },
+      "ground_truth": [
+        [
+          "book_flight(access_token='workshop-token-2109', card_id='card-2109', travel_from='SFO', travel_to='ORD', travel_date='2027-10-19', travel_class='economy')"
+        ],
+        [],
+        [
+          "cancel_booking(access_token='workshop-token-2109', booking_id='1272272')"
+        ]
+      ],
+      "provenance": {
+        "kind": "authored",
+        "version": "workshop-v2",
+        "notes": "New teaching scenario using unchanged BFCL TravelAPI and checker; not an official BFCL question."
+      }
     }
   ]
 }

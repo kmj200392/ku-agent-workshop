@@ -1,0 +1,349 @@
+{
+  "date": "2026-10-29",
+  "model": "gpt-6-luna",
+  "reasoningEffort": "none",
+  "protocolHash": "85718912fb2f78a4f00ca62d8ce439a7a3ba35d394ea108cfb9583072fa94a82",
+  "suiteFileSha256": "5319c1ef6d8f4b2604922b90033228254b7611b1f3e97c10cb6cf3bedf5458eb",
+  "protocol": {
+    "model": "gpt-6-luna",
+    "reasoning_effort": "none",
+    "endpoint": "https://api.openai.com/v1/chat/completions",
+    "max_completion_tokens": 2048,
+    "limits": {
+      "codeBytes": 102400,
+      "resultBytes": 32768,
+      "modelCalls": 8,
+      "toolCalls": 16,
+      "caseModelCalls": 40,
+      "caseToolCalls": 80,
+      "caseMs": 180000,
+      "outputTokens": 2048
+    },
+    "suiteSha256": "63cddf95d3a52963db7e6deb3e646254cec6a1efc5d38fce0422a15bc0b26777",
+    "agents": [
+      {
+        "name": "starter",
+        "sha256": "3f291d49e0ed2dc8a2c68818f830481a74fec6df31c0c3031af00cd287be3129"
+      },
+      {
+        "name": "compiled",
+        "sha256": "44fc4a75cbd3944dd6c801e06e54f94dd060049a8add270469b208b9c228e6ea"
+      },
+      {
+        "name": "no_memory",
+        "sha256": "5eb85c0b7b88b3686ff7f6ce95f369b066726e84940350f2b50704d02503b56a"
+      }
+    ]
+  },
+  "requests": 999,
+  "httpStatuses": {
+    "200": 999
+  },
+  "agents": {
+    "starter": {
+      "sourceSha256": "3f291d49e0ed2dc8a2c68818f830481a74fec6df31c0c3031af00cd287be3129",
+      "splits": {
+        "practice": {
+          "passed": 5,
+          "total": 12,
+          "elapsedMs": 149841,
+          "modelCalls": 82,
+          "toolCalls": 50,
+          "category": {
+            "base": {
+              "passed": 1,
+              "total": 3
+            },
+            "conditional": {
+              "passed": 1,
+              "total": 1
+            },
+            "long_context": {
+              "passed": 1,
+              "total": 2
+            },
+            "memory": {
+              "passed": 1,
+              "total": 1
+            },
+            "miss_func": {
+              "passed": 0,
+              "total": 2
+            },
+            "miss_param": {
+              "passed": 1,
+              "total": 3
+            }
+          },
+          "provenance": {
+            "authored": {
+              "passed": 5,
+              "total": 6
+            },
+            "bfcl": {
+              "passed": 0,
+              "total": 6
+            }
+          }
+        },
+        "final": {
+          "passed": 11,
+          "total": 30,
+          "elapsedMs": 499410,
+          "modelCalls": 281,
+          "toolCalls": 189,
+          "category": {
+            "base": {
+              "passed": 3,
+              "total": 9
+            },
+            "conditional": {
+              "passed": 2,
+              "total": 2
+            },
+            "long_context": {
+              "passed": 2,
+              "total": 5
+            },
+            "memory": {
+              "passed": 1,
+              "total": 1
+            },
+            "miss_func": {
+              "passed": 1,
+              "total": 5
+            },
+            "miss_param": {
+              "passed": 2,
+              "total": 8
+            }
+          },
+          "provenance": {
+            "adapted_bfcl": {
+              "passed": 2,
+              "total": 14
+            },
+            "authored": {
+              "passed": 7,
+              "total": 10
+            },
+            "bfcl": {
+              "passed": 2,
+              "total": 6
+            }
+          }
+        }
+      },
+      "usage": {
+        "prompt_tokens": 1411078,
+        "completion_tokens": 16265,
+        "total_tokens": 1427343
+      }
+    },
+    "compiled": {
+      "sourceSha256": "44fc4a75cbd3944dd6c801e06e54f94dd060049a8add270469b208b9c228e6ea",
+      "splits": {
+        "practice": {
+          "passed": 11,
+          "total": 12,
+          "elapsedMs": 88626,
+          "modelCalls": 36,
+          "toolCalls": 45,
+          "category": {
+            "base": {
+              "passed": 3,
+              "total": 3
+            },
+            "conditional": {
+              "passed": 1,
+              "total": 1
+            },
+            "long_context": {
+              "passed": 1,
+              "total": 2
+            },
+            "memory": {
+              "passed": 1,
+              "total": 1
+            },
+            "miss_func": {
+              "passed": 2,
+              "total": 2
+            },
+            "miss_param": {
+              "passed": 3,
+              "total": 3
+            }
+          },
+          "provenance": {
+            "authored": {
+              "passed": 5,
+              "total": 6
+            },
+            "bfcl": {
+              "passed": 6,
+              "total": 6
+            }
+          }
+        },
+        "final": {
+          "passed": 26,
+          "total": 30,
+          "elapsedMs": 299636,
+          "modelCalls": 129,
+          "toolCalls": 157,
+          "category": {
+            "base": {
+              "passed": 8,
+              "total": 9
+            },
+            "conditional": {
+              "passed": 2,
+              "total": 2
+            },
+            "long_context": {
+              "passed": 4,
+              "total": 5
+            },
+            "memory": {
+              "passed": 1,
+              "total": 1
+            },
+            "miss_func": {
+              "passed": 4,
+              "total": 5
+            },
+            "miss_param": {
+              "passed": 7,
+              "total": 8
+            }
+          },
+          "provenance": {
+            "adapted_bfcl": {
+              "passed": 12,
+              "total": 14
+            },
+            "authored": {
+              "passed": 8,
+              "total": 10
+            },
+            "bfcl": {
+              "passed": 6,
+              "total": 6
+            }
+          }
+        }
+      },
+      "usage": {
+        "prompt_tokens": 969368,
+        "completion_tokens": 16177,
+        "total_tokens": 985545
+      }
+    },
+    "no_memory": {
+      "sourceSha256": "5eb85c0b7b88b3686ff7f6ce95f369b066726e84940350f2b50704d02503b56a",
+      "splits": {
+        "practice": {
+          "passed": 1,
+          "total": 12,
+          "elapsedMs": 177639,
+          "modelCalls": 105,
+          "toolCalls": 71,
+          "category": {
+            "base": {
+              "passed": 1,
+              "total": 3
+            },
+            "conditional": {
+              "passed": 0,
+              "total": 1
+            },
+            "long_context": {
+              "passed": 0,
+              "total": 2
+            },
+            "memory": {
+              "passed": 0,
+              "total": 1
+            },
+            "miss_func": {
+              "passed": 0,
+              "total": 2
+            },
+            "miss_param": {
+              "passed": 0,
+              "total": 3
+            }
+          },
+          "provenance": {
+            "authored": {
+              "passed": 0,
+              "total": 6
+            },
+            "bfcl": {
+              "passed": 1,
+              "total": 6
+            }
+          }
+        },
+        "final": {
+          "passed": 1,
+          "total": 30,
+          "elapsedMs": 595776,
+          "modelCalls": 366,
+          "toolCalls": 271,
+          "category": {
+            "base": {
+              "passed": 1,
+              "total": 9
+            },
+            "conditional": {
+              "passed": 0,
+              "total": 2
+            },
+            "long_context": {
+              "passed": 0,
+              "total": 5
+            },
+            "memory": {
+              "passed": 0,
+              "total": 1
+            },
+            "miss_func": {
+              "passed": 0,
+              "total": 5
+            },
+            "miss_param": {
+              "passed": 0,
+              "total": 8
+            }
+          },
+          "provenance": {
+            "adapted_bfcl": {
+              "passed": 1,
+              "total": 14
+            },
+            "authored": {
+              "passed": 0,
+              "total": 10
+            },
+            "bfcl": {
+              "passed": 0,
+              "total": 6
+            }
+          }
+        }
+      },
+      "usage": {
+        "prompt_tokens": 1646354,
+        "completion_tokens": 18091,
+        "total_tokens": 1664445
+      }
+    }
+  },
+  "limitations": [
+    "One completed run per agent, not repeated-run averages.",
+    "Instructor OpenAI endpoint only; school API latency and classroom concurrency not tested.",
+    "Original final20 informed instructor development; authored additions are not an independent blind holdout."
+  ]
+}

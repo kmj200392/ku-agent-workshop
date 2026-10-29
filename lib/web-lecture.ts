@@ -1,3 +1,4 @@
+import {BENCHMARK} from './benchmark-config.mjs';
 import source from './day1-lessons.json';
 
 export type Concept = {
@@ -43,7 +44,7 @@ chapter('memory').concept.nodes=['명시적 선호 저장','브라우저 저장�
 chapter('memory').example!.observe=['저장소에서 읽은 프로필 값','새 대화 입력에 포함된 프로필','일회성 요청 후에도 유지된 장기 선호'];
 Object.assign(chapter('day2').concept,{
  left_title:'BFCL 여행 예약 에이전트',left:['여러 턴의 항공료 조회·예약·취소 요청','같은 케이스 안에서 대화와 상태 유지','정보나 도구가 부족하면 호출 보류'],
- right_title:'실제 처리 결과로 비교',right:['모든 턴을 통과한 케이스당 1점','연습 6개 · 최종 20개 · 동점은 공동 순위','호출 수와 시간은 개선을 위한 참고 정보'],
+ right_title:'실제 처리 결과로 비교',right:['모든 턴을 통과한 케이스당 1점',`연습 ${BENCHMARK.practiceCount}개 · 최종 ${BENCHMARK.finalCount}개 · 동점은 공동 순위`,'호출 수와 시간은 개선을 위한 참고 정보'],
  bottom:'개인 학교 또는 OpenAI API 키 사용 · 브라우저에서 실행·채점 · 서버에는 결과 요약 저장',
 });
 chapter('reference').appendix![1].bottom='웹에서는 참가 · API 설정을 확인하세요. 예시 기록은 API 호출 없이 볼 수 있습니다.';

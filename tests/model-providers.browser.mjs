@@ -39,9 +39,9 @@ try{
  await button('워크스페이스').click();
  await page.getByLabel('에이전트 Python 코드',{exact:true}).fill('async def agent(task, api):\n    reply = await api.chat([{"role": "user", "content": "Say done"}], [])\n    return reply["content"]');
  await button('제출하고 평가').click();
- await page.waitForFunction(()=>JSON.parse(localStorage.getItem('ku-agent:bfcl-travel-v1:last-result')||'null')?.uploaded,undefined,{timeout:180000});
- result=await page.evaluate(()=>JSON.parse(localStorage.getItem('ku-agent:bfcl-travel-v1:last-result')));
- assert.equal(result.status,'completed',JSON.stringify(result.cases.map(c=>c.error)));assert.equal(result.cases.length,6);assert.equal(result.provider,'openai');assert.equal(result.model,'gpt-6-luna');
+ await page.waitForFunction(()=>JSON.parse(localStorage.getItem('ku-agent:bfcl-travel-v2:last-result')||'null')?.uploaded,undefined,{timeout:180000});
+ result=await page.evaluate(()=>JSON.parse(localStorage.getItem('ku-agent:bfcl-travel-v2:last-result')));
+ assert.equal(result.status,'completed',JSON.stringify(result.cases.map(c=>c.error)));assert.equal(result.cases.length,12);assert.equal(result.provider,'openai');assert.equal(result.model,'gpt-6-luna');
  const board=await page.evaluate(()=>fetch('/api/leaderboard').then(r=>r.json()));assert.equal(board.entries[0].provider,'openai');assert.equal(board.entries[0].model,'gpt-6-luna');
  const persisted=await page.evaluate(()=>JSON.stringify({...localStorage,...sessionStorage}));assert(!persisted.includes('fixture-openai'));assert(uploads.every(x=>!x?.includes('fixture-openai')));
  await page.reload();await button('API 및 참가 설정').click();assert.equal(await page.locator('#api-key').inputValue(),'');

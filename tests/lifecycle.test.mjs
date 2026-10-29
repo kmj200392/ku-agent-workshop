@@ -19,6 +19,7 @@ test('freeze selects latest completed version, excludes incomplete and late resu
  insert.run('error','a','bad','hash5','practice','error',70,80,CONFIG.practiceVersion);
  insert.run('another-person','b','other','hash6','practice','completed',75,85,CONFIG.practiceVersion);
  insert.run('old-benchmark','a','old retail','hash7','practice','completed',80,85,'retail-practice-v1');
+ insert.run('old-suite-v1','a','old v1','hash8','practice','completed',81,86,'bfcl-travel-practice-v1');
  d.exec("UPDATE runs SET provider='openai',model='gpt-6-luna' WHERE id='latest-valid'");
  const frozen=d.prepare(FINAL_CANDIDATE_SQL).get('a',90,CONFIG.practiceVersion);
  assert.equal(frozen.id,'latest-valid');assert.equal(frozen.provider,'openai');assert.equal(frozen.model,'gpt-6-luna');

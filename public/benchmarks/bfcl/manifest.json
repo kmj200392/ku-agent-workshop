@@ -1,10 +1,10 @@
 {
-  "name": "BFCL V4 Multi-turn \u00b7 TravelAPI workshop subset",
+  "name": "BFCL TravelAPI workshop extension v2",
   "commit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8",
   "upstream": "https://github.com/ShishirPatil/gorilla",
   "license": "Apache-2.0",
-  "practiceCount": 6,
-  "finalCount": 20,
+  "practiceCount": 12,
+  "finalCount": 30,
   "upstreamFileHashes": {
     "LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
     "bfcl_eval/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -36,12 +36,20 @@
     "Curated subset with disjoint task families",
     "JSON-schema type normalization for OpenAI-compatible API",
     "Browser worker transport and bounded workshop execution",
-    "Original English inputs, state, tools and checks retained"
+    "Existing initial state and reference actions retained; wording clarified in 14 final variants with per-case provenance",
+    "16 authored workshop cases added using unchanged TravelAPI and upstream checkers"
   ],
   "excludedFamilies": {
     "153": "Passport verification fails but next turn assumes success",
     "164": "Budget request conflicts with actual booking fare",
     "159": "Insurance coverage versus premium/type ambiguity",
     "179": "Requested discount has no corresponding operation"
-  }
+  },
+  "workshopVersion": "bfcl-travel-v2",
+  "authoredCounts": {
+    "practice": 6,
+    "final": 10
+  },
+  "practiceFamilies": 8,
+  "finalFamilies": 17
 }

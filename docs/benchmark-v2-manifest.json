@@ -1,0 +1,43 @@
+{
+  "version": "bfcl-travel-v2",
+  "sourceFileSha256": "cb74cd359ecad227e7680c92a92238d2bb797533cd0ad4f87a1025fde3be5384",
+  "suiteSha256": "5319c1ef6d8f4b2604922b90033228254b7611b1f3e97c10cb6cf3bedf5458eb",
+  "splits": {
+    "practice": {
+      "count": 12,
+      "families": 8,
+      "categories": {
+        "base": 3,
+        "conditional": 1,
+        "long_context": 2,
+        "memory": 1,
+        "miss_func": 2,
+        "miss_param": 3
+      },
+      "turns": 35,
+      "provenance": {
+        "bfcl": 6,
+        "adapted_bfcl": 0,
+        "authored": 6
+      }
+    },
+    "final": {
+      "count": 30,
+      "families": 17,
+      "categories": {
+        "base": 9,
+        "conditional": 2,
+        "long_context": 5,
+        "memory": 1,
+        "miss_func": 5,
+        "miss_param": 8
+      },
+      "turns": 127,
+      "provenance": {
+        "bfcl": 6,
+        "adapted_bfcl": 14,
+        "authored": 10
+      }
+    }
+  }
+}

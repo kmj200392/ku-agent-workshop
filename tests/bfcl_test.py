@@ -42,11 +42,11 @@ class BFCLTests(unittest.TestCase):
                     result=replay(item)
                     self.assertTrue(result['passed'], result)
     def test_split_has_no_shared_family_or_problem_id(self):
-        self.assertEqual([len(SUITES[x]) for x in ['practice','final']],[6,20])
+        self.assertEqual([len(SUITES[x]) for x in ['practice','final']],[12,30])
         self.assertFalse({x['family'] for x in SUITES['practice']} & {x['family'] for x in SUITES['final']})
         self.assertFalse({'153','159','164','179'} & {x['family'] for ts in SUITES.values() for x in ts})
     def test_doing_nothing_does_not_pass(self):
-        for item in SUITES['practice']:
+        for item in SUITES['practice']+SUITES['final']:
             w=WorkshopWorld(item,DOCS)
             for _ in range(len(item['ground_truth'])-1):w.next('I completed it')
             self.assertFalse(w.grade('I completed it')['passed'])
@@ -80,6 +80,35 @@ class BFCLTests(unittest.TestCase):
             self.assertEqual(hashlib.sha256((VENDOR/rel).read_bytes()).hexdigest(),digest,rel)
     def test_repeated_runs_start_from_fresh_state(self):
         for _ in range(2):self.assertTrue(replay(SUITES['practice'][3])['passed'])
+    def test_every_authored_case_requires_its_final_reference_action(self):
+        for item in SUITES['practice']+SUITES['final']:
+            if item['provenance']['kind']!='authored':continue
+            with self.subTest(id=item['id']):
+                plan=oracle(item)
+                final_action=max(i for i,turn in enumerate(plan) if turn)
+                plan[final_action]=plan[final_action][:-1]
+                w=WorkshopWorld(item,DOCS)
+                for i,turn in enumerate(plan):
+                    if i:w.next('done')
+                    for c in turn:w.tool(c['name'],c['arguments'])
+                self.assertFalse(w.grade('done')['passed'])
+    def test_abstention_turns_reject_unrelated_lookup_in_every_case(self):
+        for item in SUITES['practice']+SUITES['final']:
+            if not any(not turn for turn in item['ground_truth']):continue
+            with self.subTest(id=item['id']):
+                w=WorkshopWorld(item,DOCS)
+                for i,turn in enumerate(oracle(item)):
+                    if i:w.next('done')
+                    for c in turn:w.tool(c['name'],c['arguments'])
+                    if not turn:w.tool('list_all_airports',{})
+                self.assertFalse(w.grade('done')['passed'])
+    def test_wrong_booking_reference_is_rejected(self):
+        for number in ['1103','2106','2107']:
+            item=next(c for cases in SUITES.values() for c in cases if c['family']==number)
+            def mutate(turn,name,args):
+                if name=='cancel_booking':args={**args,'booking_id':'nonexistent-booking'}
+                return name,args
+            self.assertFalse(replay(item,mutate)['passed'])
     def test_tool_transport_accepts_only_literal_named_calls(self):
         w=WorkshopWorld(SUITES['practice'][0],DOCS)
         with self.assertRaises(ValueError):w.tool('__import__',{})

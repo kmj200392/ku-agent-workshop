@@ -11,9 +11,10 @@ bfcl_eval/ are unmodified; hashes and dataset source hashes are in manifest.json
 Copyright and license notices remain in the redistributed source and LICENSE.
 
 Workshop additions/changes:
-- 6 practice cases from 2 original story families; 20 final cases from 7 other families.
-- Excludes families153,159,164,179 after reviewing ambiguous or contradictory user requirements.
-- Original English prompts, initial state, tool semantics and answers retained. Korean titles/UI added.
+- v2: 12 practice cases from 8 families; 30 final cases from 17 disjoint families.
+- Retains 26 BFCL-derived tasks (14 final variants have clarified wording), adds 6 authored practice tasks and 10 authored final tasks. Per-case provenance records all edits. Authored tasks are not official BFCL questions.
+- Excludes families 153, 159, 164, 179 after reviewing ambiguous or contradictory user requirements.
+- Retained BFCL cases keep their original initial state and reference actions. Tool semantics are unchanged. Prompts remain in English, with the wording changes recorded in provenance; Korean titles/UI are added.
 - The upstream missing-function restoration message is preserved.
 - JSON Schema types are normalized for the OpenAI-compatible Gateway; response documentation is
   appended to tool descriptions. Browser transport is implemented in workshop_bridge.py.
@@ -25,7 +26,7 @@ Workshop additions/changes:
 
 This is a BFCL-based classroom leaderboard, not an official BFCL leaderboard submission or overall score.
 Student browsers execute tools and grade results; uploaded scores are client-reported, not tamper-proof.
-The final set contains variants of7 stories, not20 statistically independent scenarios.
+The final set contains variants of 17 stories, not 30 statistically independent scenarios. The original 20 tasks were inspected during instructor development; this is a teaching benchmark, not an independently blinded evaluation.
 
-To reproduce the selected data from the pinned source: python3 scripts/bfcl/import.py
+To reproduce v2 from the preserved v1 Git snapshot: python3 scripts/bfcl/expand-v2.py. Reference actions and source checksums are verified before model evaluation.
 Source selection and original IDs are retained with the project. Final data is delivered after code freeze.

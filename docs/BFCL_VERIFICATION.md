@@ -1,5 +1,7 @@
 # BFCL 도입 검증 · 2026-10-26
 
+> 아래는 v1(연습 6개·최종 20개)의 당시 기록이다. 현재 v2 구성과 검증은 [BENCHMARK_V2_VALIDATION.md](BENCHMARK_V2_VALIDATION.md)를 참고한다.
+
 모델: `claude-haiku-5-5`. 실제 Chrome에서 학교 Gateway로 직접 호출했다. 키는 기존 비공개 환경 파일에서 읽었으며 소스나 배포물에 넣지 않았다.
 
 ## 원본과 실행 검증

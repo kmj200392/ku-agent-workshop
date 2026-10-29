@@ -16,6 +16,7 @@ const storageKey=(k:string)=>'ku-agent:'+(k==='code'?'bfcl-travel-v1:':['last-re
 const storage={get:(k:string,fallback:any)=>{try{return JSON.parse(localStorage.getItem(storageKey(k))||'null')??fallback;}catch{return fallback;}},set:(k:string,v:any)=>{try{localStorage.setItem(storageKey(k),JSON.stringify(v));return true;}catch{return false;}}};
 async function api(path:string,data?:any):Promise<any>{const r=await fetch('/api/'+path,data===undefined?{cache:'no-store'}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});const d:any=await r.json();if(!r.ok)throw Error(d.error||'요청 실패');return d;}
 const loadRuntime=()=>import('../lib/browser-client.mjs');
+const reviewSnapshot=(cases:any[])=>cases.map(({id,entry,ground_truth})=>({id,entry:{question:entry.question,missed_function:entry.missed_function},ground_truth}));
 function download(name:string,data:string,type='text/plain'){const url=URL.createObjectURL(new Blob([data],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 const statusText=(s:string)=>({completed:'평가 완료',error:'실행 오류 · 순위 미반영',aborted:'중단됨 · 순위 미반영',running:'실행 중',expired:'마감 후 완료 · 순위 미반영',pass:'통과',fail:'실패'}[s]||s);
 const fmt=(n:number)=>`${(n/1000).toFixed(1)}초`;
@@ -27,6 +28,7 @@ export default function Workshop(){
  const setKey=(value:string)=>setApiKeys(old=>({...old,[provider]:value}));
  const [authMode,setAuthMode]=useState('register'),[accessCode,setAccessCode]=useState(''),[issuedCode,setIssuedCode]=useState(''),[authBusy,setAuthBusy]=useState(false),[authError,setAuthError]=useState('');
  const [busy,setBusy]=useState(false),[stage,setStage]=useState(''),[current,setCurrent]=useState(''),[records,setRecords]=useState<any[]>([]),[result,setResult]=useState<any>(null),[pending,setPending]=useState<any>(null),[suite,setSuite]=useState<any[]>([]),[activeCases,setActiveCases]=useState<any[]>([]),[expanded,setExpanded]=useState(''),[board,setBoard]=useState<any>(null),[boardKind,setBoardKind]=useState('practice'),[boardError,setBoardError]=useState('');
+ const [finalReviewError,setFinalReviewError]=useState(''),[reviewRetry,setReviewRetry]=useState(0);
  const [evaluationMode,setEvaluationMode]=useState('practice'),[quickResult,setQuickResult]=useState<any>(null),[selectedCases,setSelectedCases]=useState<string[]>([]);
  const [demoProgress,setDemoProgress]=useState<TraceEvent[]>([]);
  const [demoReady,setDemoReady]=useState(false);
@@ -45,6 +47,22 @@ export default function Workshop(){
   const onUnload=(e:BeforeUnloadEvent)=>{if(busyRef.current){e.preventDefault();e.returnValue='';}};window.addEventListener('beforeunload',onUnload);
   return()=>{window.removeEventListener('hashchange',handleHash);window.removeEventListener('beforeunload',onUnload);};
  },[]);
+ useEffect(()=>{
+  setFinalReviewError('');
+  if(!config||result?.kind!=='final'||result.status!=='completed'||result.reviewCases)return;
+  if(result.suite!==config.finalVersion){setFinalReviewError('이전 평가 버전의 결과입니다. 아래에 저장된 채점 기록과 실행 로그를 확인해주세요.');return;}
+  if(config.phase==='practice')return;
+  let cancelled=false;
+  api('suite?kind=final').then(tests=>{
+   if(tests.version!==result.suite)throw Error('결과와 문제 버전이 달라 상세 해설을 불러오지 못했습니다.');
+   if(cancelled)return;
+   const reviewCases=reviewSnapshot(tests.cases);
+   setResult((old:any)=>old?.runId===result.runId&&old.suite===result.suite?{...old,reviewCases}:old);
+   const saved=storage.get('last-result',null);
+   if(saved?.runId===result.runId&&saved.suite===result.suite)storage.set('last-result',{...saved,reviewCases});
+  }).catch((e:any)=>{if(!cancelled)setFinalReviewError(e.message);});
+  return()=>{cancelled=true;};
+ },[config?.phase,config?.finalVersion,result?.runId,result?.suite,result?.status,result?.kind,result?.reviewCases,reviewRetry]);
  useEffect(()=>{if(demoReady)storage.set('api-provider',provider);},[provider,demoReady]);
  useEffect(()=>{if(ready&&code)storage.set('code',code);},[code,ready]);
  useEffect(()=>{if(!demoReady)return;storage.set('demo-selected',demo);storage.set('demo-mode',demoMode);setDemoResult(storage.get(`demo:${demoMode}:${demo}`,null));setDemoStatus('');},[demo,demoMode,demoReady]);
@@ -82,7 +100,7 @@ export default function Workshop(){
     if(event.kind==='tool')setStage(`${event.caseId} · ${event.name} 실행 중`);
     if(event.kind==='case-end')setRecords(r=>[...r,event.record]);
    }});abortRef.current=job.abort;if(runKind.current==='stopping')job.abort();
-   const outcome=await job.promise;const full={...outcome,provider:runProvider,model:runConfig.model,runId:submitted.runId,hash:submitted.hash,kind:quick?'quick':final?'final':'practice',suite:tests.version,total:tests.cases.length,at:Date.now(),uploaded:false};
+   const outcome=await job.promise;const full={...outcome,provider:runProvider,model:runConfig.model,runId:submitted.runId,hash:submitted.hash,kind:quick?'quick':final?'final':'practice',suite:tests.version,total:tests.cases.length,at:Date.now(),uploaded:false,...(final&&outcome.status==='completed'?{reviewCases:reviewSnapshot(tests.cases)}:{})};
    if(quick){setQuickResult(full);storage.set('quick-result',full);return;}
    setResult(full);if(!storage.set('last-result',full))setNotice('브라우저 저장 공간이 부족합니다. 실행 기록을 다운로드해주세요.');
    const payload=rt.summaryForUpload(submitted.runId,outcome);storage.set('pending',payload);setPending(payload);setStage('점수 요약을 저장하는 중…');await upload(payload);
@@ -108,6 +126,8 @@ export default function Workshop(){
   catch(e:any){setDemoStatus('실행 실패 · 기존 결과 유지: '+e.message);}finally{clearTimeout(timer);setDemoBusy(false);demoAbort.current=null;}
  }
  const displayResult=evaluationMode==='quick'?quickResult:result;const shownRecords=busy?records:displayResult?.cases||[];const passed=(result?.cases||[]).filter((r:any)=>r.status==='pass').length;
+ const finalReview=!busy&&displayResult?.kind==='final'&&displayResult.status==='completed';
+ const feedbackCases=busy?(runKind.current==='final'?[]:suite):displayResult?.kind==='final'?(finalReview?displayResult.reviewCases||[]:[]):suite;
  return <div className="shell">
   <aside className="sidebar"><a className="brand" href="#arena" onClick={()=>navigate('arena')}><img className="brand-mark" src="/brand/circle_blue.svg" alt="" width={34} height={34}/><span>Lecture<small>KU AGENT LAB · GDGoC</small></span></a>
    <div className="course-tag"><span className="dot"/>2026. 10. 28 — 29<span className="tag">WORKSHOP</span></div>
@@ -129,9 +149,10 @@ export default function Workshop(){
      <div className="editor-footer"><button className="text-button" disabled={busy} onClick={async()=>setCode(await fetch('/starter.py').then(r=>r.text()))}><RefreshCw size={13}/>시작 코드</button><span>{new TextEncoder().encode(code).length.toLocaleString()} B / 100 KiB</span></div>
      <div className="evaluation-options"><div className="segmented" aria-label="평가 방식"><button disabled={busy} aria-pressed={evaluationMode==='quick'} className={evaluationMode==='quick'?'selected':''} onClick={()=>setEvaluationMode('quick')}>빠른 테스트 · 1–3개</button><button disabled={busy} aria-pressed={evaluationMode==='practice'} className={evaluationMode==='practice'?'selected':''} onClick={()=>setEvaluationMode('practice')}>전체 평가 · {config&&config.phase!=='practice'?BENCHMARK.finalCount:BENCHMARK.practiceCount}개</button></div>{evaluationMode==='quick'?<QuickTests cases={suite} selected={selectedCases} onSelect={setSelectedCases} disabled={busy||config?.phase!=='practice'}/>:<p>{config&&config.phase!=='practice'?`고정된 코드로 최종 ${BENCHMARK.finalCount}문항을 평가합니다. 오류·중단 시 같은 코드로 재시도할 수 있으며, 완료 점수는 한 번 확정됩니다.`:`전체 연습 ${BENCHMARK.practiceCount}문항을 평가해 순위에 반영합니다. 마감 전 평가를 완료한 제출 중 가장 최근 코드가 최종 평가에 사용됩니다.`}</p>}</div>
      <div className="submit-bar"><div><ShieldCheck size={16}/><small>{evaluationMode==='quick'?'선택 문제만 실행 · 순위·최종 제출에 미반영':'코드 제출 → 로컬 실행 → 자동 채점 → 순위 반영'}</small></div>{busy?<button className="button danger" onClick={()=>abortRef.current?.()}><Square size={14}/>중단</button>:<button className="button primary" disabled={!ready||!config||config.phase==='closed'||demoBusy||(evaluationMode==='quick'&&(!selectedCases.length||config.phase!=='practice'))} onClick={()=>start(config.phase==='final',evaluationMode==='quick')}><Play size={15}/>{evaluationMode==='quick'?'선택 문제 실행':config?.phase==='final'?'최종 평가 재시도':'제출하고 평가'}</button>}</div>
-    </div><div className="panel result-panel"><div className="panel-header"><div><Terminal size={17}/><b>{evaluationMode==='quick'?'빠른 테스트 결과':'공식 평가 결과'}</b></div><span className={'pill '+(busy?'working':'neutral')}>{busy?'실행 중':displayResult?statusText(displayResult.status):'대기 중'}</span></div>
+    </div><div className="panel result-panel"><div className="panel-header"><div><Terminal size={17}/><b>{evaluationMode==='quick'?'빠른 테스트 결과':displayResult?.kind==='final'?'최종 평가 결과':'공식 평가 결과'}</b></div><span className={'pill '+(busy?'working':'neutral')}>{busy?'실행 중':displayResult?statusText(displayResult.status):'대기 중'}</span></div>
       {busy&&<div className="run-progress" role="status"><LoaderCircle className="spin" size={16}/><span>{stage}</span><div className="progress-track"><i style={{width:`${records.length/Math.max(activeCases.length,1)*100}%`}}/></div></div>}
-      {!shownRecords.length&&!busy?<div className="empty"><div className="empty-icon"><FlaskConical size={29}/></div><h3>첫 번째 실험을 기다리고 있어요</h3><p>시작 코드를 수정한 뒤 제출해보세요.<br/>케이스별 성공·실패와 도구 기록을 확인할 수 있어요.</p><div className="step-labels"><span>실행</span><ChevronRight size={13}/><span>평가</span><ChevronRight size={13}/><span>개선</span></div></div>:<div className="case-list">{(busy?activeCases:shownRecords).map((s:any)=>{const r=shownRecords.find((r:any)=>r.id===s.id);return <div className={'case '+(expanded===s.id?'open':'')} key={s.id}><button className="case-heading" onClick={()=>setExpanded(expanded===s.id?'':s.id)}><span className={'case-icon '+(r?.status||'')}>{r?.status==='pass'?<Check size={15}/>:r?.status==='fail'||r?.status==='error'?<X size={15}/>:current===s.id?<LoaderCircle size={15} className="spin"/>:<span/>}</span><div><b>{s.label||s.id.replace("multi_turn_", "")} <span>{s.title}</span></b><small>{r?`${statusText(r.status)} · ${fmt(r.elapsed)}${r.status==='fail'&&suite.some(test=>test.id===r.id)?' · 실패 이유 보기':''}`:current===s.id?'평가 중':'대기 중'}</small></div><ChevronRight size={15}/></button>{expanded===s.id&&r&&<div className="case-detail">{displayResult?.kind!=='final'&&<PracticeFeedback test={suite.find(test=>test.id===r.id)} record={r}/>}<details><summary>채점 기록 원문</summary>{r.checks?.map((c:any)=><p key={c.label} className={c.pass?'check-pass':'check-fail'}>{c.pass?'✓':'✕'} {c.label}</p>)}{r.error&&<pre>{r.error}</pre>}</details><p className="subtle">모델 {r.modelCalls}회 · 도구 {r.toolCalls}회</p><details><summary>답변과 실행 로그 보기</summary><pre>{JSON.stringify({answer:r.answer,trace:r.trace},null,2)}</pre></details></div>}</div>;})}</div>}
+      {finalReview&&<div className="final-review-notice"><b>최종 {displayResult.cases.length}문항 평가 완료</b><p>문항을 펼쳐 통과 여부, 첫 실패 턴, 기대 동작과 실제 실행을 확인하세요. 조회만으로 재평가하거나 점수를 변경하지 않습니다.</p>{!displayResult.reviewCases&&(finalReviewError?<><p role="alert">{finalReviewError}</p><button className="text-button" onClick={()=>setReviewRetry(n=>n+1)}>해설 다시 불러오기</button></>:<p role="status">{config?.phase==='practice'?'최종 문제가 공개되면 상세 해설을 불러옵니다.':'상세 해설을 불러오는 중…'}</p>)}</div>}
+      {!shownRecords.length&&!busy?<div className="empty"><div className="empty-icon"><FlaskConical size={29}/></div><h3>첫 번째 실험을 기다리고 있어요</h3><p>시작 코드를 수정한 뒤 제출해보세요.<br/>케이스별 성공·실패와 도구 기록을 확인할 수 있어요.</p><div className="step-labels"><span>실행</span><ChevronRight size={13}/><span>평가</span><ChevronRight size={13}/><span>개선</span></div></div>:<div className="case-list">{(busy?activeCases:shownRecords).map((s:any)=>{const r=shownRecords.find((r:any)=>r.id===s.id);return <div className={'case '+(expanded===s.id?'open':'')} key={s.id}><button className="case-heading" onClick={()=>setExpanded(expanded===s.id?'':s.id)}><span className={'case-icon '+(r?.status||'')}>{r?.status==='pass'?<Check size={15}/>:r?.status==='fail'||r?.status==='error'?<X size={15}/>:current===s.id?<LoaderCircle size={15} className="spin"/>:<span/>}</span><div><b>{s.label||s.id.replace("multi_turn_", "")} <span>{s.title}</span></b><small>{r?`${statusText(r.status)} · ${fmt(r.elapsed)}${r.status==='fail'&&feedbackCases.some((test:any)=>test.id===r.id)?' · 실패 이유 보기':''}`:current===s.id?'평가 중':'대기 중'}</small></div><ChevronRight size={15}/></button>{expanded===s.id&&r&&<div className="case-detail"><PracticeFeedback test={feedbackCases.find((test:any)=>test.id===r.id)} record={r} kind={finalReview?'final':'practice'}/><details><summary>채점 기록 원문</summary>{r.checks?.map((c:any)=><p key={c.label} className={c.pass?'check-pass':'check-fail'}>{c.pass?'✓':'✕'} {c.label}</p>)}{r.error&&<pre>{r.error}</pre>}</details><p className="subtle">모델 {r.modelCalls}회 · 도구 {r.toolCalls}회</p><details><summary>답변과 실행 로그 보기</summary><pre>{JSON.stringify({answer:r.answer,trace:r.trace},null,2)}</pre></details></div>}</div>;})}</div>}
       {displayResult&&!busy&&<div className="result-footer"><small>{displayResult.kind==='quick'?'빠른 테스트 · 순위 미반영':displayResult.kind==='final'?'최종':'연습'} · {displayResult.model||'claude-haiku-5-5'} · {displayResult.hash?.slice(0,10)} · {displayResult.kind==='quick'?'이 브라우저에만 저장':displayResult.uploaded?'서버 저장 완료':'업로드 대기'}</small><button className="text-button" onClick={()=>download('agent-trace.json',JSON.stringify(displayResult,null,2),'application/json')}><Download size={13}/>기록</button></div>}{pending&&<button className="button secondary retry" disabled={busy} onClick={()=>upload(pending)}>결과 업로드 재시도</button>}
     </div></section>
     <div className="bottom-note"><ShieldCheck size={15}/>개인 크레딧을 사용합니다. 실행 중에는 이 탭을 열어두세요. 페이지 내 메뉴를 이동해도 실행과 결과는 유지됩니다.</div>

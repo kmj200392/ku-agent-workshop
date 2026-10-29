@@ -1,10 +1,10 @@
 import {practiceFeedback} from '../lib/practice-feedback.mjs';
 type FeedbackTurn={number:number;state:string;reason:string;hint:string;questions:string[];expected:string[];actual:{name:string;args:unknown;value:unknown}[];complete:boolean;toolErrors:unknown[];answer?:unknown};
 const labels:Record<string,string>={pass:'여기까지 통과','first-failure':'첫 실패',affected:'이전 실패 포함',ungraded:'미채점'};
-export default function PracticeFeedback({test,record}:{test:any;record:any}){
+export default function PracticeFeedback({test,record,kind='practice'}:{test:any;record:any;kind?:'practice'|'final'}){
  const feedback=practiceFeedback(test,record);if(!feedback)return null;
- return <section className="practice-feedback" aria-label="연습 문제 피드백">
-  <div className="feedback-heading"><b>{feedback.summary}</b><p>각 검사는 이전 턴을 포함합니다. 먼저 실패한 턴부터 수정해보세요.</p></div>
+ return <section className="practice-feedback" aria-label={kind==='final'?'최종 문제 피드백':'연습 문제 피드백'}>
+  <div className="feedback-heading"><b>{feedback.summary}</b><p>각 검사는 이전 턴을 포함합니다. {kind==='final'?'먼저 실패한 턴부터 확인해보세요. 확정된 점수는 바뀌지 않습니다.':'먼저 실패한 턴부터 수정해보세요.'}</p></div>
   {record.error&&<p className="feedback-warning">실행 중단: {record.error} · 실행 오류는 정답 판정과 별도로 확인하세요.</p>}
   {feedback.truncated&&<p className="feedback-warning">보관된 실행 기록이 최대치인 150개에 도달했습니다. 뒷부분이 생략됐을 수 있으므로 기록이 없는 구간은 실행하지 않았다고 판단할 수 없습니다.</p>}
   {feedback.turns.map((turn:FeedbackTurn)=><details className={'feedback-turn '+turn.state} key={turn.number} open={turn.state==='first-failure'||(feedback.firstFailure===null&&turn.number===1)}>

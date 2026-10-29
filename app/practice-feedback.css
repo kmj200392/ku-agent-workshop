@@ -1,4 +1,6 @@
 .practice-feedback{margin:8px 0 18px;color:#31455e;font-size:12px;line-height:1.7;container-type:inline-size;container-name:feedback}
+.final-review-notice{padding:14px 18px;border-bottom:1px solid var(--line);background:var(--soft);font-size:12px;color:var(--ink)}
+.final-review-notice>b{color:var(--green)}.final-review-notice p{margin-top:5px;color:var(--muted);overflow-wrap:anywhere}.final-review-notice button{margin-top:7px}
 .case-detail:has(.practice-feedback){padding-left:15px}
 .feedback-heading{margin-bottom:12px}.feedback-heading>b{font-size:14px;color:#214c85}.feedback-heading p{margin:5px 0;color:#6b7d94}
 .feedback-turn{border:1px solid #dce5f2;border-radius:8px;margin:8px 0;background:#fff;overflow:hidden}
